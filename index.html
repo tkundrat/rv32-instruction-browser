@@ -796,14 +796,14 @@ function opInfo(i){
     return {key, sort, bin:"0b"+v.toString(2).padStart(7,"0"), hex:"0x"+v.toString(16).padStart(2,"0"), name:OPN[v]||"", sub:sub.join(" · "), field:fld.join(" · ")};
   }
   const q=i.match&3, f=(i.match>>>13)&7;
-  return {key:"c"+q+"_"+f, sort:256+q*8+f, bin:"0b"+f.toString(2).padStart(3,"0")+"…"+q.toString(2).padStart(2,"0"),
-    hex:"C"+q, name:"C."+CMAP[q][f], sub:"", field:"funct3 [15:13] · op [1:0]"};
+  return {key:"c"+q+"_"+f, sort:256+q*8+f, bin:"0b"+q.toString(2).padStart(2,"0"),
+    hex:"C"+q, name:"C."+CMAP[q][f], sub:"funct3 0b"+f.toString(2).padStart(3,"0"), field:"op [1:0] · funct3 [15:13]"};
 }
 function matches(i,q){
   if(!q) return true;
   if(i.mn.includes(q)||i.asm.toLowerCase().includes(q)) return true;
   const o=opInfo(i); // also allow searching by opcode: "op-fp", "0b0110011", "0x33"
-  return o.name.toLowerCase()===q||o.bin.replace("…","")===q||o.hex===q;
+  return o.name.toLowerCase()===q||o.bin===q||o.hex===q;
 }
 function rowHtml(i,showExt){
   return '<div class="row" id="row-'+esc(i.mn)+'"><div class="meta"><div class="l1"><span class="mn" data-tip="'+esc(i.mn)+'">'+esc(i.mn)+'</span><span class="fmt">'+esc(i.fmt)+'</span>'+

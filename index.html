@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>RV32 Instruction Encodings</title>
+<style>
+/* Tokens follow macOS system colors (light / dark appearance). */
+:root{
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","Inter",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,"JetBrains Mono",Consolas,monospace;
+  --window:#f5f5f7; --content:#ffffff; --sidebar:rgba(236,236,240,.78); --toolbar:rgba(246,246,248,.82);
+  --label:rgba(0,0,0,.86); --label2:rgba(0,0,0,.55); --label3:rgba(0,0,0,.32);
+  --sep:rgba(0,0,0,.10); --sep-strong:rgba(0,0,0,.16); --fill:rgba(0,0,0,.05); --fill2:rgba(0,0,0,.035);
+  --accent:#007aff; --sel:rgba(0,122,255,.12); --seg-on:#ffffff;
+  --c-op:#af52de; --c-reg:#007aff; --c-imm:#ff9500; --c-oth:#28cd41; --c-fix:#8e8e93;
+  --tint:17%; --shadow:0 0 0 .5px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --window:#1e1e1e; --content:#262626; --sidebar:rgba(40,40,42,.78); --toolbar:rgba(38,38,40,.82);
+    --label:rgba(255,255,255,.86); --label2:rgba(255,255,255,.55); --label3:rgba(255,255,255,.28);
+    --sep:rgba(255,255,255,.10); --sep-strong:rgba(255,255,255,.16); --fill:rgba(255,255,255,.07); --fill2:rgba(255,255,255,.04);
+    --accent:#0a84ff; --sel:rgba(10,132,255,.22); --seg-on:#5b5b5f;
+    --c-op:#bf5af2; --c-reg:#0a84ff; --c-imm:#ff9f0a; --c-oth:#32d74b; --c-fix:#98989d;
+    --tint:24%; --shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 3px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --window:#1e1e1e; --content:#262626; --sidebar:rgba(40,40,42,.78); --toolbar:rgba(38,38,40,.82);
+  --label:rgba(255,255,255,.86); --label2:rgba(255,255,255,.55); --label3:rgba(255,255,255,.28);
+  --sep:rgba(255,255,255,.10); --sep-strong:rgba(255,255,255,.16); --fill:rgba(255,255,255,.07); --fill2:rgba(255,255,255,.04);
+  --accent:#0a84ff; --sel:rgba(10,132,255,.22); --seg-on:#5b5b5f;
+  --c-op:#bf5af2; --c-reg:#0a84ff; --c-imm:#ff9f0a; --c-oth:#32d74b; --c-fix:#98989d;
+  --tint:24%; --shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 3px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:64px}
+body{margin:0;background:var(--window);color:var(--label);font:13px/1.4 var(--font);-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit;cursor:default}
+:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent)!important;border-radius:6px}
+code,.mono{font-family:var(--mono)}
+
+/* Toolbar */
+.toolbar{position:sticky;top:0;z-index:10;height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;
+  background:var(--toolbar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--sep)}
+.toolbar .title{display:flex;flex-direction:column;min-width:0}
+.toolbar h1{font-size:13px;font-weight:600;margin:0;white-space:nowrap}
+.toolbar .subtitle{font-size:11px;color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toolbar .subtitle a{color:var(--accent);text-decoration:none}
+.toolbar .subtitle a:hover{text-decoration:underline}
+.spacer{flex:1}
+.search{position:relative;width:220px;flex-shrink:1;min-width:120px}
+.search svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--label2);pointer-events:none}
+.search input{width:100%;height:28px;padding:0 8px 0 27px;border-radius:7px;border:none;background:var(--fill);color:var(--label);outline:none;cursor:text}
+.search input::placeholder{color:var(--label3)}
+.switch{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--label2);white-space:nowrap}
+.switch input{appearance:none;-webkit-appearance:none;width:26px;height:15px;border-radius:8px;background:var(--fill);position:relative;margin:0;
+  box-shadow:inset 0 0 0 .5px var(--sep-strong);transition:background .15s}
+.switch input::after{content:"";position:absolute;top:1.5px;left:1.5px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{transform:translateX(11px)}
+
+/* Split view */
+.split{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:calc(100vh - 52px)}
+.sidebar{position:sticky;top:52px;align-self:start;height:calc(100vh - 52px);overflow:auto;padding:10px 10px 16px;
+  background:var(--sidebar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-right:1px solid var(--sep)}
+.sidebar,.card{scrollbar-width:thin;scrollbar-color:var(--label3) transparent}
+.sb-h{font-size:11px;font-weight:600;color:var(--label2);padding:8px 8px 4px;display:flex;align-items:center}
+.sb-h .act{margin-left:auto;display:flex;gap:2px}
+.sb-h button{border:none;background:none;color:var(--accent);font-size:11px;padding:1px 5px;border-radius:4px}
+.sb-h button:hover{background:var(--fill)}
+.src{list-style:none;margin:0;padding:0}
+.src li{display:flex;align-items:center;gap:7px;height:28px;padding:0 8px;border-radius:6px}
+.src li:hover{background:var(--fill2)}
+.src li.off .nm{color:var(--label3)}
+.src input{accent-color:var(--accent);margin:0;width:14px;height:14px}
+.src .nm{flex:1;min-width:0;text-align:left;border:none;background:none;padding:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.src .badge{font-size:11px;color:var(--label2);font-variant-numeric:tabular-nums;background:var(--fill);border-radius:9px;padding:0 6px;min-width:22px;text-align:center}
+.legend{list-style:none;margin:0;padding:0 8px}
+.legend li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--label2);padding:3px 0}
+.legend i.fld{width:14px;height:14px;min-height:0;border-radius:4px;flex-shrink:0}
+.sb-note{font-size:11px;color:var(--label2);padding:10px 8px 0;line-height:1.45}
+.sb-note code{font-size:10.5px}
+
+/* Content */
+.content{padding:4px 24px 48px;min-width:0}
+section.grp{margin-top:22px;scroll-margin-top:64px}
+.grp-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 4px 2px}
+.grp-h h2{font-size:15px;font-weight:600;margin:0}
+.grp-h .id{font:600 11px var(--mono);color:var(--label2);background:var(--fill);padding:1px 6px;border-radius:5px}
+.grp-n{font-size:12px;color:var(--label2);margin:0 4px 8px}
+.card{background:var(--content);border-radius:10px;box-shadow:var(--shadow);overflow-x:auto}
+.tbl{min-width:1000px}
+.row{display:grid;grid-template-columns:292px minmax(0,1fr);align-items:stretch;position:relative}
+.row+.row::before{content:"";position:absolute;top:0;left:12px;right:0;height:1px;background:var(--sep)}
+.row:not(.ruler):hover{background:var(--fill2)}
+.row.ruler{background:var(--fill2);border-radius:10px 10px 0 0}
+.meta{padding:7px 12px;display:flex;flex-direction:column;justify-content:center;gap:1px;min-width:0}
+.l1{display:flex;gap:7px;align-items:center}
+.mn{font:600 13px var(--mono)}
+.fmt{font:500 10px var(--mono);color:var(--label2);box-shadow:inset 0 0 0 1px var(--sep-strong);border-radius:4px;padding:0 4px;line-height:15px}
+.asm{font-size:12px;color:var(--label);opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mm{font:10.5px var(--mono);color:var(--label2);font-variant-numeric:tabular-nums}
+.rh{font-size:11px;color:var(--label2)}
+.bits{display:grid;grid-template-columns:repeat(32,minmax(0,1fr));padding:5px 12px 5px 0;gap:0 2px}
+.fld{display:flex;flex-direction:column;justify-content:center;min-height:38px;min-width:0;text-align:center;overflow:hidden;border-radius:5px;
+  background:color-mix(in srgb,var(--c) var(--tint),var(--content));box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--c) 45%,transparent)}
+.fld .v{font:600 11.5px var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
+.fld .digits{display:flex}
+.fld .digits span{flex:1;font:600 12px var(--mono)}
+.fld .digits span+span{box-shadow:-1px 0 0 color-mix(in srgb,var(--c) 22%,transparent)}
+.fld .c{font-size:9.5px;color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
+.k-fix{--c:var(--c-fix)} .k-op{--c:var(--c-op)} .k-reg{--c:var(--c-reg)} .k-imm{--c:var(--c-imm)} .k-oth{--c:var(--c-oth)}
+.rul{font:10px var(--mono);color:var(--label3);text-align:center;padding:6px 0;font-variant-numeric:tabular-nums}
+.rul.hl{color:var(--label2);font-weight:600}
+.empty{color:var(--label2);padding:60px 0;text-align:center;font-size:13px}
+.foot{color:var(--label2);font-size:11.5px;margin:28px 4px 0;max-width:900px;line-height:1.5}
+
+/* Segmented control + push buttons */
+.seg{display:inline-flex;background:var(--fill);border-radius:7px;padding:2px;gap:2px;flex-shrink:0}
+.seg button{border:none;background:none;height:22px;padding:0 11px;border-radius:5px;font-size:12px;font-weight:500;color:var(--label)}
+.seg button[aria-pressed="true"]{background:var(--seg-on);box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.14)}
+.btn{border:none;background:var(--seg-on);color:var(--label);box-shadow:0 0 0 .5px var(--sep-strong),0 1px 1px rgba(0,0,0,.06);border-radius:6px;height:22px;padding:0 10px;font-size:12px}
+.btn:active{filter:brightness(.93)}
+
+/* Opcode view */
+.ophead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:20px 4px 10px;font-size:12px;color:var(--label2)}
+.ophead .spacer{flex:1}
+details.op{background:var(--content);border-radius:10px;box-shadow:var(--shadow);margin-bottom:10px}
+details.op>summary{list-style:none;display:flex;gap:10px;padding:10px 14px;align-items:flex-start;border-radius:10px}
+details.op>summary::-webkit-details-marker{display:none}
+details.op>summary:hover{background:var(--fill2)}
+details.op[open]>summary{border-radius:10px 10px 0 0}
+.chev{width:10px;height:10px;margin-top:6px;flex-shrink:0;color:var(--label2);transition:transform .15s}
+details.op[open]>summary .chev{transform:rotate(90deg)}
+.op-main{min-width:0;flex:1}
+.op-l1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.op-bin{font:600 14px var(--mono);letter-spacing:.02em}
+.op-dot{width:8px;height:8px;border-radius:50%;background:var(--c-op);flex-shrink:0}
+.op-name{font-weight:600}
+.op-hex{font:11px var(--mono);color:var(--label2)}
+.op-sub{font:600 12.5px var(--mono);background:var(--fill);border-radius:5px;padding:1px 6px}
+.op-field{font-size:11px;color:var(--label3)}
+.op-exts{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.tag{font:600 10px var(--mono);color:var(--label2);background:var(--fill);border-radius:4px;padding:1px 5px;white-space:nowrap}
+.op-mns{margin-top:6px;display:flex;flex-wrap:wrap;gap:2px 4px;margin-left:-4px}
+.mnchip{font:12.5px var(--mono);border:none;background:none;padding:1px 4px;border-radius:4px;color:var(--accent)}
+.mnchip:hover{background:var(--sel)}
+.op-body{padding:2px 10px 10px}
+.op-body .card{box-shadow:0 0 0 .5px var(--sep-strong)}
+@keyframes flash{from{background:var(--sel)}to{background:transparent}}
+.row.flash{animation:flash 1.8s ease-out}
+
+/* Narrow windows: sidebar becomes a horizontal source strip */
+@media (max-width:760px){
+  .toolbar{height:auto;flex-wrap:wrap;padding:8px 16px;gap:8px}
+  .toolbar .title{flex-basis:100%}
+  .search{flex:1;width:auto}
+  .split{grid-template-columns:1fr}
+  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--sep);padding:6px 8px}
+  .src{display:flex;overflow-x:auto;gap:2px;scrollbar-width:none}
+  .src::-webkit-scrollbar{display:none}
+  .tbl{min-width:640px}
+  .row{grid-template-columns:1fr}
+  .row .meta{padding:8px 12px 2px}
+  .row .bits{padding:2px 12px 8px}
+  .row.ruler .meta{display:none}
+  .row.ruler .bits{padding-top:6px}
+  .src li{flex-shrink:0}
+  .legend,.sb-note,.sb-h.lg{display:none}
+  .content{padding:4px 16px 40px}
+  html{scroll-padding-top:110px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="toolbar">
+  <div class="title">
+    <h1>RV32 Instruction Encodings</h1>
+    <div class="subtitle">Based on the <a href="https://docs.riscv.org/reference/isa/v20260120/unpriv/rv32.html" target="_blank" rel="noopener">RISC-V Unprivileged ISA v20260120</a></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="seg" role="group" aria-label="View"><button data-view="ext" aria-pressed="true">Extensions</button><button data-view="op" aria-pressed="false">Opcodes</button></div>
+  <label class="search" aria-label="Filter instructions">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>
+    <input type="search" id="q" placeholder="Search" autocomplete="off" spellcheck="false">
+  </label>
+  <label class="switch"><input type="checkbox" id="showmm" role="switch">Match/Mask</label>
+</header>
+<div class="split">
+  <nav class="sidebar" aria-label="Extensions">
+    <div class="sb-h">Extensions<span class="act"><button id="all">All</button><button id="none">None</button></span></div>
+    <ul class="src" id="src"></ul>
+    <div class="sb-h lg" style="margin-top:12px">Legend</div>
+    <ul class="legend">
+      <li><i class="k-op fld"></i>opcode / op</li>
+      <li><i class="k-fix fld"></i>fixed funct / constant</li>
+      <li><i class="k-reg fld"></i>register specifier</li>
+      <li><i class="k-imm fld"></i>immediate / offset</li>
+      <li><i class="k-oth fld"></i>csr, rm, aq/rl, fence bits</li>
+    </ul>
+    <p class="sb-note"><code>imm[12|10:5]</code> lists the immediate bits held by a field, MSB first. <code>rd′</code>/<code>rs1′</code>/<code>rs2′</code> encode x8–x15 (f8–f15).</p>
+  </nav>
+  <main class="content">
+    <div id="out"></div>
+    <p class="foot">Encodings checked against the RISC-V Unprivileged ISA manual (v20260120): Ch. 36 instruction listings (RV32I, Zifencei, Zicsr, M, A, F, D), RVC listing figures (C) and per-instruction encodings (Zicond, Zba/Zbb/Zbc/Zbs). The privileged groups (Priv, Smrnmi, Smctr, Svinval, H) were checked against the Vol. II Ch. 19 privileged instruction listings. F/D register fields name f-registers where the syntax says <code>fd</code>/<code>fs1</code>/…; hover over a field to see its bit range and value. Append <code>?ext=RV32I,M,C</code> to the URL to open with only those extensions shown, and <code>&amp;view=op</code> for the opcode view (plus <code>&amp;by=f3</code>, <code>f7</code> or <code>f37</code> to group by funct3/funct7 as well). In the opcode view, C instructions are grouped by their RVC opcode-map cell (funct3 + op); the search field also accepts an opcode such as <code>op-fp</code>, <code>0x33</code> or <code>0b0110011</code>.</p>
+  </main>
+</div>
+
+<script id="isa" type="text/plain">
+# RV32I | RV32I Base Integer | Ch. 1 – the 40 base instructions plus FENCE.TSO (a FENCE encoding with fm=1000)
+lui        |U|lui rd, imm20|rd imm20 6..0=0x37
+auipc      |U|auipc rd, imm20|rd imm20 6..0=0x17
+jal        |J|jal rd, offset|rd jimm20 6..0=0x6f
+jalr       |I|jalr rd, offset(rs1)|rd rs1 imm12 14..12=0 6..0=0x67
+beq        |B|beq rs1, rs2, offset|bimm12hi rs1 rs2 bimm12lo 14..12=0 6..0=0x63
+bne        |B|bne rs1, rs2, offset|bimm12hi rs1 rs2 bimm12lo 14..12=1 6..0=0x63
+blt        |B|blt rs1, rs2, offset|bimm12hi rs1 rs2 bimm12lo 14..12=4 6..0=0x63
+bge        |B|bge rs1, rs2, offset|bimm12hi rs1 rs2 bimm12lo 14..12=5 6..0=0x63
+bltu       |B|bltu rs1, rs2, offset|bimm12hi rs1 rs2 bimm12lo 14..12=6 6..0=0x63
+bgeu       |B|bgeu rs1, rs2, offset|bimm12hi rs1 rs2 bimm12lo 14..12=7 6..0=0x63
+lb         |I|lb rd, offset(rs1)|rd rs1 imm12 14..12=0 6..0=0x03
+lh         |I|lh rd, offset(rs1)|rd rs1 imm12 14..12=1 6..0=0x03
+lw         |I|lw rd, offset(rs1)|rd rs1 imm12 14..12=2 6..0=0x03
+lbu        |I|lbu rd, offset(rs1)|rd rs1 imm12 14..12=4 6..0=0x03
+lhu        |I|lhu rd, offset(rs1)|rd rs1 imm12 14..12=5 6..0=0x03
+sb         |S|sb rs2, offset(rs1)|imm12hi rs1 rs2 imm12lo 14..12=0 6..0=0x23
+sh         |S|sh rs2, offset(rs1)|imm12hi rs1 rs2 imm12lo 14..12=1 6..0=0x23
+sw         |S|sw rs2, offset(rs1)|imm12hi rs1 rs2 imm12lo 14..12=2 6..0=0x23
+addi       |I|addi rd, rs1, imm12|rd rs1 imm12 14..12=0 6..0=0x13
+slti       |I|slti rd, rs1, imm12|rd rs1 imm12 14..12=2 6..0=0x13
+sltiu      |I|sltiu rd, rs1, imm12|rd rs1 imm12 14..12=3 6..0=0x13
+xori       |I|xori rd, rs1, imm12|rd rs1 imm12 14..12=4 6..0=0x13
+ori        |I|ori rd, rs1, imm12|rd rs1 imm12 14..12=6 6..0=0x13
+andi       |I|andi rd, rs1, imm12|rd rs1 imm12 14..12=7 6..0=0x13
+slli       |I|slli rd, rs1, shamt|rd rs1 shamt 31..25=0 14..12=1 6..0=0x13
+srli       |I|srli rd, rs1, shamt|rd rs1 shamt 31..25=0 14..12=5 6..0=0x13
+srai       |I|srai rd, rs1, shamt|rd rs1 shamt 31..25=0x20 14..12=5 6..0=0x13
+add        |R|add rd, rs1, rs2|rd rs1 rs2 31..25=0 14..12=0 6..0=0x33
+sub        |R|sub rd, rs1, rs2|rd rs1 rs2 31..25=0x20 14..12=0 6..0=0x33
+sll        |R|sll rd, rs1, rs2|rd rs1 rs2 31..25=0 14..12=1 6..0=0x33
+slt        |R|slt rd, rs1, rs2|rd rs1 rs2 31..25=0 14..12=2 6..0=0x33
+sltu       |R|sltu rd, rs1, rs2|rd rs1 rs2 31..25=0 14..12=3 6..0=0x33
+xor        |R|xor rd, rs1, rs2|rd rs1 rs2 31..25=0 14..12=4 6..0=0x33
+srl        |R|srl rd, rs1, rs2|rd rs1 rs2 31..25=0 14..12=5 6..0=0x33
+sra        |R|sra rd, rs1, rs2|rd rs1 rs2 31..25=0x20 14..12=5 6..0=0x33
+or         |R|or rd, rs1, rs2|rd rs1 rs2 31..25=0 14..12=6 6..0=0x33
+and        |R|and rd, rs1, rs2|rd rs1 rs2 31..25=0 14..12=7 6..0=0x33
+fence      |I|fence pred, succ|fm pred succ rs1 14..12=0 rd 6..0=0x0f
+fence.tso  |I|fence.tso|31..28=8 27..24=3 23..20=3 19..15=0 14..12=0 11..7=0 6..0=0x0f
+ecall      |I|ecall|31..20=0 19..15=0 14..12=0 11..7=0 6..0=0x73
+ebreak     |I|ebreak|31..20=1 19..15=0 14..12=0 11..7=0 6..0=0x73
+
+# Zifencei | Zifencei – Instruction-Fetch Fence | Ch. 4 – imm/rs1/rd are reserved and should be zero
+fence.i    |I|fence.i|imm12 rs1 14..12=1 rd 6..0=0x0f
+
+# Zicsr | Zicsr – Control and Status Registers | Ch. 5 – uimm is the zero-extended 5-bit immediate in the rs1 field
+csrrw      |I|csrrw rd, csr, rs1|rd rs1 csr 14..12=1 6..0=0x73
+csrrs      |I|csrrs rd, csr, rs1|rd rs1 csr 14..12=2 6..0=0x73
+csrrc      |I|csrrc rd, csr, rs1|rd rs1 csr 14..12=3 6..0=0x73
+csrrwi     |I|csrrwi rd, csr, uimm|rd uimm csr 14..12=5 6..0=0x73
+csrrsi     |I|csrrsi rd, csr, uimm|rd uimm csr 14..12=6 6..0=0x73
+csrrci     |I|csrrci rd, csr, uimm|rd uimm csr 14..12=7 6..0=0x73
+
+# Zihintpause | Zihintpause – Pause Hint | Ch. 8 – a FENCE with pred=W, succ=0, fm=0, rs1=rd=x0
+pause      |I|pause|31..28=0 27..24=1 23..20=0 19..15=0 14..12=0 11..7=0 6..0=0x0f
+
+# M | "M" Integer Multiplication and Division | Ch. 11
+mul        |R|mul rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=0 6..0=0x33
+mulh       |R|mulh rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=1 6..0=0x33
+mulhsu     |R|mulhsu rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=2 6..0=0x33
+mulhu      |R|mulhu rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=3 6..0=0x33
+div        |R|div rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=4 6..0=0x33
+divu       |R|divu rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=5 6..0=0x33
+rem        |R|rem rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=6 6..0=0x33
+remu       |R|remu rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=7 6..0=0x33
+
+# A | "A" Atomic Instructions (Zalrsc + Zaamo) | Ch. 12 – aq/rl set acquire/release ordering (e.g. amoadd.w.aqrl)
+lr.w       |R|lr.w rd, (rs1)|rd rs1 aq rl 31..27=0x02 24..20=0 14..12=2 6..0=0x2f
+sc.w       |R|sc.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x03 14..12=2 6..0=0x2f
+amoswap.w  |R|amoswap.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x01 14..12=2 6..0=0x2f
+amoadd.w   |R|amoadd.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x00 14..12=2 6..0=0x2f
+amoxor.w   |R|amoxor.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x04 14..12=2 6..0=0x2f
+amoand.w   |R|amoand.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x0c 14..12=2 6..0=0x2f
+amoor.w    |R|amoor.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x08 14..12=2 6..0=0x2f
+amomin.w   |R|amomin.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x10 14..12=2 6..0=0x2f
+amomax.w   |R|amomax.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x14 14..12=2 6..0=0x2f
+amominu.w  |R|amominu.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x18 14..12=2 6..0=0x2f
+amomaxu.w  |R|amomaxu.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x1c 14..12=2 6..0=0x2f
+
+# F | "F" Single-Precision Floating-Point | Ch. 20 – rm: 000 RNE, 001 RTZ, 010 RDN, 011 RUP, 100 RMM, 111 DYN
+flw        |I|flw fd, offset(rs1)|rd rs1 imm12 14..12=2 6..0=0x07
+fsw        |S|fsw fs2, offset(rs1)|imm12hi rs1 rs2 imm12lo 14..12=2 6..0=0x27
+fmadd.s    |R4|fmadd.s fd, fs1, fs2, fs3, rm|rd rs1 rs2 rs3 rm 26..25=0 6..0=0x43
+fmsub.s    |R4|fmsub.s fd, fs1, fs2, fs3, rm|rd rs1 rs2 rs3 rm 26..25=0 6..0=0x47
+fnmsub.s   |R4|fnmsub.s fd, fs1, fs2, fs3, rm|rd rs1 rs2 rs3 rm 26..25=0 6..0=0x4b
+fnmadd.s   |R4|fnmadd.s fd, fs1, fs2, fs3, rm|rd rs1 rs2 rs3 rm 26..25=0 6..0=0x4f
+fadd.s     |R|fadd.s fd, fs1, fs2, rm|rd rs1 rs2 rm 31..25=0x00 6..0=0x53
+fsub.s     |R|fsub.s fd, fs1, fs2, rm|rd rs1 rs2 rm 31..25=0x04 6..0=0x53
+fmul.s     |R|fmul.s fd, fs1, fs2, rm|rd rs1 rs2 rm 31..25=0x08 6..0=0x53
+fdiv.s     |R|fdiv.s fd, fs1, fs2, rm|rd rs1 rs2 rm 31..25=0x0c 6..0=0x53
+fsqrt.s    |R|fsqrt.s fd, fs1, rm|rd rs1 24..20=0 rm 31..25=0x2c 6..0=0x53
+fsgnj.s    |R|fsgnj.s fd, fs1, fs2|rd rs1 rs2 31..25=0x10 14..12=0 6..0=0x53
+fsgnjn.s   |R|fsgnjn.s fd, fs1, fs2|rd rs1 rs2 31..25=0x10 14..12=1 6..0=0x53
+fsgnjx.s   |R|fsgnjx.s fd, fs1, fs2|rd rs1 rs2 31..25=0x10 14..12=2 6..0=0x53
+fmin.s     |R|fmin.s fd, fs1, fs2|rd rs1 rs2 31..25=0x14 14..12=0 6..0=0x53
+fmax.s     |R|fmax.s fd, fs1, fs2|rd rs1 rs2 31..25=0x14 14..12=1 6..0=0x53
+fcvt.w.s   |R|fcvt.w.s rd, fs1, rm|rd rs1 24..20=0 rm 31..25=0x60 6..0=0x53
+fcvt.wu.s  |R|fcvt.wu.s rd, fs1, rm|rd rs1 24..20=1 rm 31..25=0x60 6..0=0x53
+fmv.x.w    |R|fmv.x.w rd, fs1|rd rs1 24..20=0 31..25=0x70 14..12=0 6..0=0x53
+feq.s      |R|feq.s rd, fs1, fs2|rd rs1 rs2 31..25=0x50 14..12=2 6..0=0x53
+flt.s      |R|flt.s rd, fs1, fs2|rd rs1 rs2 31..25=0x50 14..12=1 6..0=0x53
+fle.s      |R|fle.s rd, fs1, fs2|rd rs1 rs2 31..25=0x50 14..12=0 6..0=0x53
+fclass.s   |R|fclass.s rd, fs1|rd rs1 24..20=0 31..25=0x70 14..12=1 6..0=0x53
+fcvt.s.w   |R|fcvt.s.w fd, rs1, rm|rd rs1 24..20=0 rm 31..25=0x68 6..0=0x53
+fcvt.s.wu  |R|fcvt.s.wu fd, rs1, rm|rd rs1 24..20=1 rm 31..25=0x68 6..0=0x53
+fmv.w.x    |R|fmv.w.x fd, rs1|rd rs1 24..20=0 31..25=0x78 14..12=0 6..0=0x53
+
+# D | "D" Double-Precision Floating-Point | Ch. 21 – on RV32 there is no fmv.x.d / fmv.d.x
+fld        |I|fld fd, offset(rs1)|rd rs1 imm12 14..12=3 6..0=0x07
+fsd        |S|fsd fs2, offset(rs1)|imm12hi rs1 rs2 imm12lo 14..12=3 6..0=0x27
+fmadd.d    |R4|fmadd.d fd, fs1, fs2, fs3, rm|rd rs1 rs2 rs3 rm 26..25=1 6..0=0x43
+fmsub.d    |R4|fmsub.d fd, fs1, fs2, fs3, rm|rd rs1 rs2 rs3 rm 26..25=1 6..0=0x47
+fnmsub.d   |R4|fnmsub.d fd, fs1, fs2, fs3, rm|rd rs1 rs2 rs3 rm 26..25=1 6..0=0x4b
+fnmadd.d   |R4|fnmadd.d fd, fs1, fs2, fs3, rm|rd rs1 rs2 rs3 rm 26..25=1 6..0=0x4f
+fadd.d     |R|fadd.d fd, fs1, fs2, rm|rd rs1 rs2 rm 31..25=0x01 6..0=0x53
+fsub.d     |R|fsub.d fd, fs1, fs2, rm|rd rs1 rs2 rm 31..25=0x05 6..0=0x53
+fmul.d     |R|fmul.d fd, fs1, fs2, rm|rd rs1 rs2 rm 31..25=0x09 6..0=0x53
+fdiv.d     |R|fdiv.d fd, fs1, fs2, rm|rd rs1 rs2 rm 31..25=0x0d 6..0=0x53
+fsqrt.d    |R|fsqrt.d fd, fs1, rm|rd rs1 24..20=0 rm 31..25=0x2d 6..0=0x53
+fsgnj.d    |R|fsgnj.d fd, fs1, fs2|rd rs1 rs2 31..25=0x11 14..12=0 6..0=0x53
+fsgnjn.d   |R|fsgnjn.d fd, fs1, fs2|rd rs1 rs2 31..25=0x11 14..12=1 6..0=0x53
+fsgnjx.d   |R|fsgnjx.d fd, fs1, fs2|rd rs1 rs2 31..25=0x11 14..12=2 6..0=0x53
+fmin.d     |R|fmin.d fd, fs1, fs2|rd rs1 rs2 31..25=0x15 14..12=0 6..0=0x53
+fmax.d     |R|fmax.d fd, fs1, fs2|rd rs1 rs2 31..25=0x15 14..12=1 6..0=0x53
+fcvt.s.d   |R|fcvt.s.d fd, fs1, rm|rd rs1 24..20=1 rm 31..25=0x20 6..0=0x53
+fcvt.d.s   |R|fcvt.d.s fd, fs1, rm|rd rs1 24..20=0 rm 31..25=0x21 6..0=0x53
+feq.d      |R|feq.d rd, fs1, fs2|rd rs1 rs2 31..25=0x51 14..12=2 6..0=0x53
+flt.d      |R|flt.d rd, fs1, fs2|rd rs1 rs2 31..25=0x51 14..12=1 6..0=0x53
+fle.d      |R|fle.d rd, fs1, fs2|rd rs1 rs2 31..25=0x51 14..12=0 6..0=0x53
+fclass.d   |R|fclass.d rd, fs1|rd rs1 24..20=0 31..25=0x71 14..12=1 6..0=0x53
+fcvt.w.d   |R|fcvt.w.d rd, fs1, rm|rd rs1 24..20=0 rm 31..25=0x61 6..0=0x53
+fcvt.wu.d  |R|fcvt.wu.d rd, fs1, rm|rd rs1 24..20=1 rm 31..25=0x61 6..0=0x53
+fcvt.d.w   |R|fcvt.d.w fd, rs1, rm|rd rs1 24..20=0 rm 31..25=0x69 6..0=0x53
+fcvt.d.wu  |R|fcvt.d.wu fd, rs1, rm|rd rs1 24..20=1 rm 31..25=0x69 6..0=0x53
+
+# Zicond | Zicond – Integer Conditional Operations | Ch. 10
+czero.eqz  |R|czero.eqz rd, rs1, rs2|rd rs1 rs2 31..25=0x07 14..12=5 6..0=0x33
+czero.nez  |R|czero.nez rd, rs1, rs2|rd rs1 rs2 31..25=0x07 14..12=7 6..0=0x33
+
+# Zba | Zba – Address Generation (B) | Ch. 29 – RV32 subset
+sh1add     |R|sh1add rd, rs1, rs2|rd rs1 rs2 31..25=0x10 14..12=2 6..0=0x33
+sh2add     |R|sh2add rd, rs1, rs2|rd rs1 rs2 31..25=0x10 14..12=4 6..0=0x33
+sh3add     |R|sh3add rd, rs1, rs2|rd rs1 rs2 31..25=0x10 14..12=6 6..0=0x33
+
+# Zbb | Zbb – Basic Bit-Manipulation (B) | Ch. 29 – RV32 subset
+andn       |R|andn rd, rs1, rs2|rd rs1 rs2 31..25=0x20 14..12=7 6..0=0x33
+orn        |R|orn rd, rs1, rs2|rd rs1 rs2 31..25=0x20 14..12=6 6..0=0x33
+xnor       |R|xnor rd, rs1, rs2|rd rs1 rs2 31..25=0x20 14..12=4 6..0=0x33
+clz        |I|clz rd, rs1|rd rs1 31..20=0x600 14..12=1 6..0=0x13
+ctz        |I|ctz rd, rs1|rd rs1 31..20=0x601 14..12=1 6..0=0x13
+cpop       |I|cpop rd, rs1|rd rs1 31..20=0x602 14..12=1 6..0=0x13
+max        |R|max rd, rs1, rs2|rd rs1 rs2 31..25=0x05 14..12=6 6..0=0x33
+maxu       |R|maxu rd, rs1, rs2|rd rs1 rs2 31..25=0x05 14..12=7 6..0=0x33
+min        |R|min rd, rs1, rs2|rd rs1 rs2 31..25=0x05 14..12=4 6..0=0x33
+minu       |R|minu rd, rs1, rs2|rd rs1 rs2 31..25=0x05 14..12=5 6..0=0x33
+sext.b     |I|sext.b rd, rs1|rd rs1 31..20=0x604 14..12=1 6..0=0x13
+sext.h     |I|sext.h rd, rs1|rd rs1 31..20=0x605 14..12=1 6..0=0x13
+zext.h     |R|zext.h rd, rs1|rd rs1 24..20=0 31..25=0x04 14..12=4 6..0=0x33
+rol        |R|rol rd, rs1, rs2|rd rs1 rs2 31..25=0x30 14..12=1 6..0=0x33
+ror        |R|ror rd, rs1, rs2|rd rs1 rs2 31..25=0x30 14..12=5 6..0=0x33
+rori       |I|rori rd, rs1, shamt|rd rs1 shamt 31..25=0x30 14..12=5 6..0=0x13
+orc.b      |I|orc.b rd, rs1|rd rs1 31..20=0x287 14..12=5 6..0=0x13
+rev8       |I|rev8 rd, rs1|rd rs1 31..20=0x698 14..12=5 6..0=0x13
+
+# Zbc | Zbc – Carry-less Multiplication (B) | Ch. 29
+clmul      |R|clmul rd, rs1, rs2|rd rs1 rs2 31..25=0x05 14..12=1 6..0=0x33
+clmulr     |R|clmulr rd, rs1, rs2|rd rs1 rs2 31..25=0x05 14..12=2 6..0=0x33
+clmulh     |R|clmulh rd, rs1, rs2|rd rs1 rs2 31..25=0x05 14..12=3 6..0=0x33
+
+# Zbs | Zbs – Single-Bit Instructions (B) | Ch. 29 – RV32 subset
+bclr       |R|bclr rd, rs1, rs2|rd rs1 rs2 31..25=0x24 14..12=1 6..0=0x33
+bclri      |I|bclri rd, rs1, shamt|rd rs1 shamt 31..25=0x24 14..12=1 6..0=0x13
+bext       |R|bext rd, rs1, rs2|rd rs1 rs2 31..25=0x24 14..12=5 6..0=0x33
+bexti      |I|bexti rd, rs1, shamt|rd rs1 shamt 31..25=0x24 14..12=5 6..0=0x13
+binv       |R|binv rd, rs1, rs2|rd rs1 rs2 31..25=0x34 14..12=1 6..0=0x33
+binvi      |I|binvi rd, rs1, shamt|rd rs1 shamt 31..25=0x34 14..12=1 6..0=0x13
+bset       |R|bset rd, rs1, rs2|rd rs1 rs2 31..25=0x14 14..12=1 6..0=0x33
+bseti      |I|bseti rd, rs1, shamt|rd rs1 shamt 31..25=0x14 14..12=1 6..0=0x13
+
+# C | "C" Compressed Instructions (RV32) | Ch. 27 – 16-bit; incl. RV32 FP loads/stores (Zcf/Zcd). rd'/rs1'/rs2' = x8–x15
+c.addi4spn |CIW|c.addi4spn rd', sp, nzuimm|15..13=0 12..5:nzuimm[5:4|9:6|2|3] 4..2:rd' 1..0=0
+c.fld      |CL|c.fld fd', uimm(rs1')|15..13=1 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[7:6] 4..2:rd' 1..0=0
+c.lw       |CL|c.lw rd', uimm(rs1')|15..13=2 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[2|6] 4..2:rd' 1..0=0
+c.flw      |CL|c.flw fd', uimm(rs1')|15..13=3 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[2|6] 4..2:rd' 1..0=0
+c.fsd      |CS|c.fsd fs2', uimm(rs1')|15..13=5 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[7:6] 4..2:rs2' 1..0=0
+c.sw       |CS|c.sw rs2', uimm(rs1')|15..13=6 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[2|6] 4..2:rs2' 1..0=0
+c.fsw      |CS|c.fsw fs2', uimm(rs1')|15..13=7 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[2|6] 4..2:rs2' 1..0=0
+c.nop      |CI|c.nop|15..13=0 12=0 11..7=0 6..2=0 1..0=1
+c.addi     |CI|c.addi rd, nzimm|15..13=0 12:nzimm[5] 11..7:rd/rs1 6..2:nzimm[4:0] 1..0=1
+c.jal      |CJ|c.jal offset|15..13=1 12..2:imm[11|4|9:8|10|6|7|3:1|5] 1..0=1
+c.li       |CI|c.li rd, imm|15..13=2 12:imm[5] 11..7:rd 6..2:imm[4:0] 1..0=1
+c.addi16sp |CI|c.addi16sp sp, nzimm|15..13=3 12:nzimm[9] 11..7=2:rd=sp 6..2:nzimm[4|6|8:7|5] 1..0=1
+c.lui      |CI|c.lui rd, nzimm|15..13=3 12:nzimm[17] 11..7:rd 6..2:nzimm[16:12] 1..0=1
+c.srli     |CB|c.srli rd', shamt|15..13=4 12=0:shamt[5] 11..10=0 9..7:rd'/rs1' 6..2:shamt[4:0] 1..0=1
+c.srai     |CB|c.srai rd', shamt|15..13=4 12=0:shamt[5] 11..10=1 9..7:rd'/rs1' 6..2:shamt[4:0] 1..0=1
+c.andi     |CB|c.andi rd', imm|15..13=4 12:imm[5] 11..10=2 9..7:rd'/rs1' 6..2:imm[4:0] 1..0=1
+c.sub      |CA|c.sub rd', rs2'|15..10=0x23 9..7:rd'/rs1' 6..5=0 4..2:rs2' 1..0=1
+c.xor      |CA|c.xor rd', rs2'|15..10=0x23 9..7:rd'/rs1' 6..5=1 4..2:rs2' 1..0=1
+c.or       |CA|c.or rd', rs2'|15..10=0x23 9..7:rd'/rs1' 6..5=2 4..2:rs2' 1..0=1
+c.and      |CA|c.and rd', rs2'|15..10=0x23 9..7:rd'/rs1' 6..5=3 4..2:rs2' 1..0=1
+c.j        |CJ|c.j offset|15..13=5 12..2:imm[11|4|9:8|10|6|7|3:1|5] 1..0=1
+c.beqz     |CB|c.beqz rs1', offset|15..13=6 12..10:imm[8|4:3] 9..7:rs1' 6..2:imm[7:6|2:1|5] 1..0=1
+c.bnez     |CB|c.bnez rs1', offset|15..13=7 12..10:imm[8|4:3] 9..7:rs1' 6..2:imm[7:6|2:1|5] 1..0=1
+c.slli     |CI|c.slli rd, shamt|15..13=0 12=0:shamt[5] 11..7:rd/rs1 6..2:shamt[4:0] 1..0=2
+c.fldsp    |CI|c.fldsp fd, uimm(sp)|15..13=1 12:uimm[5] 11..7:rd 6..2:uimm[4:3|8:6] 1..0=2
+c.lwsp     |CI|c.lwsp rd, uimm(sp)|15..13=2 12:uimm[5] 11..7:rd 6..2:uimm[4:2|7:6] 1..0=2
+c.flwsp    |CI|c.flwsp fd, uimm(sp)|15..13=3 12:uimm[5] 11..7:rd 6..2:uimm[4:2|7:6] 1..0=2
+c.jr       |CR|c.jr rs1|15..12=8 11..7:rs1 6..2=0 1..0=2
+c.mv       |CR|c.mv rd, rs2|15..12=8 11..7:rd 6..2:rs2 1..0=2
+c.ebreak   |CR|c.ebreak|15..12=9 11..7=0 6..2=0 1..0=2
+c.jalr     |CR|c.jalr rs1|15..12=9 11..7:rs1 6..2=0 1..0=2
+c.add      |CR|c.add rd, rs2|15..12=9 11..7:rd/rs1 6..2:rs2 1..0=2
+c.fsdsp    |CSS|c.fsdsp fs2, uimm(sp)|15..13=5 12..7:uimm[5:3|8:6] 6..2:rs2 1..0=2
+c.swsp     |CSS|c.swsp rs2, uimm(sp)|15..13=6 12..7:uimm[5:2|7:6] 6..2:rs2 1..0=2
+c.fswsp    |CSS|c.fswsp fs2, uimm(sp)|15..13=7 12..7:uimm[5:2|7:6] 6..2:rs2 1..0=2
+
+# Priv | Trap Return, Interrupt and Memory Management | Privileged ISA (Vol. II) Ch. 19 listings
+mret       |I|mret|31..20=0x302 19..15=0 14..12=0 11..7=0 6..0=0x73
+sret       |I|sret|31..20=0x102 19..15=0 14..12=0 11..7=0 6..0=0x73
+wfi        |I|wfi|31..20=0x105 19..15=0 14..12=0 11..7=0 6..0=0x73
+sfence.vma |R|sfence.vma rs1, rs2|rs1 rs2 31..25=0x09 14..12=0 11..7=0 6..0=0x73
+
+# Smrnmi | Smrnmi – Resumable Non-Maskable Interrupts | Vol. II
+mnret      |I|mnret|31..20=0x702 19..15=0 14..12=0 11..7=0 6..0=0x73
+
+# Smctr | Smctr/Ssctr – Control Transfer Records | Vol. II
+sctrclr    |I|sctrclr|31..20=0x104 19..15=0 14..12=0 11..7=0 6..0=0x73
+
+# Svinval | Svinval – Fine-Grained Address-Translation Cache Invalidation | Vol. II
+sinval.vma      |R|sinval.vma rs1, rs2|rs1 rs2 31..25=0x0b 14..12=0 11..7=0 6..0=0x73
+sfence.w.inval  |I|sfence.w.inval|31..20=0x180 19..15=0 14..12=0 11..7=0 6..0=0x73
+sfence.inval.ir |I|sfence.inval.ir|31..20=0x181 19..15=0 14..12=0 11..7=0 6..0=0x73
+hinval.vvma     |R|hinval.vvma rs1, rs2|rs1 rs2 31..25=0x13 14..12=0 11..7=0 6..0=0x73
+hinval.gvma     |R|hinval.gvma rs1, rs2|rs1 rs2 31..25=0x33 14..12=0 11..7=0 6..0=0x73
+
+# H | Hypervisor Extension (RV32) | Vol. II – HLV.WU, HLV.D and HSV.D are RV64-only and omitted
+hfence.vvma |R|hfence.vvma rs1, rs2|rs1 rs2 31..25=0x11 14..12=0 11..7=0 6..0=0x73
+hfence.gvma |R|hfence.gvma rs1, rs2|rs1 rs2 31..25=0x31 14..12=0 11..7=0 6..0=0x73
+hlv.b       |R|hlv.b rd, (rs1)|rd rs1 24..20=0 31..25=0x30 14..12=4 6..0=0x73
+hlv.bu      |R|hlv.bu rd, (rs1)|rd rs1 24..20=1 31..25=0x30 14..12=4 6..0=0x73
+hlv.h       |R|hlv.h rd, (rs1)|rd rs1 24..20=0 31..25=0x32 14..12=4 6..0=0x73
+hlv.hu      |R|hlv.hu rd, (rs1)|rd rs1 24..20=1 31..25=0x32 14..12=4 6..0=0x73
+hlvx.hu     |R|hlvx.hu rd, (rs1)|rd rs1 24..20=3 31..25=0x32 14..12=4 6..0=0x73
+hlv.w       |R|hlv.w rd, (rs1)|rd rs1 24..20=0 31..25=0x34 14..12=4 6..0=0x73
+hlvx.wu     |R|hlvx.wu rd, (rs1)|rd rs1 24..20=3 31..25=0x34 14..12=4 6..0=0x73
+hsv.b       |R|hsv.b rs2, (rs1)|rs1 rs2 31..25=0x31 14..12=4 11..7=0 6..0=0x73
+hsv.h       |R|hsv.h rs2, (rs1)|rs1 rs2 31..25=0x33 14..12=4 11..7=0 6..0=0x73
+hsv.w       |R|hsv.w rs2, (rs1)|rs1 rs2 31..25=0x35 14..12=4 11..7=0 6..0=0x73
+</script>
+
+<script>
+(function(){
+"use strict";
+const ARGS = {
+  rd:[[11,7,"rd","reg"]], rs1:[[19,15,"rs1","reg"]], rs2:[[24,20,"rs2","reg"]], rs3:[[31,27,"rs3","reg"]],
+  imm12:[[31,20,"imm[11:0]","imm"]], imm20:[[31,12,"imm[31:12]","imm"]],
+  jimm20:[[31,31,"imm[20]","imm"],[30,21,"imm[10:1]","imm"],[20,20,"imm[11]","imm"],[19,12,"imm[19:12]","imm"]],
+  bimm12hi:[[31,31,"imm[12]","imm"],[30,25,"imm[10:5]","imm"]],
+  bimm12lo:[[11,8,"imm[4:1]","imm"],[7,7,"imm[11]","imm"]],
+  imm12hi:[[31,25,"imm[11:5]","imm"]], imm12lo:[[11,7,"imm[4:0]","imm"]],
+  shamt:[[24,20,"shamt","imm"]], uimm:[[19,15,"uimm[4:0]","imm"]],
+  csr:[[31,20,"csr","oth"]], rm:[[14,12,"rm","oth"]], aq:[[26,26,"aq","oth"]], rl:[[25,25,"rl","oth"]],
+  fm:[[31,28,"fm","oth"]], pred:[[27,24,"pred","oth"]], succ:[[23,20,"succ","oth"]],
+};
+const CAP32 = {"6..0":"opcode","14..12":"funct3","31..25":"funct7","31..27":"funct5","26..25":"fmt",
+  "24..20":"rs2","19..15":"rs1","11..7":"rd","31..20":"funct12","31..28":"fm","27..24":"pred","23..20":"succ"};
+const CAP16 = {"1..0":"op","15..13":"funct3","15..12":"funct4","15..10":"funct6","11..10":"funct2","6..5":"funct2",
+  "11..7":"rd/rs1","6..2":"rs2","12":"funct1"};
+
+const num=s=>(s=s.trim()).startsWith("0b")?parseInt(s.slice(2),2):Number(s);
+const kindOf=l=>/^(rd|rs)/.test(l)?"reg":/imm|off|shamt/.test(l)?"imm":"oth";
+function parseSpec(spec){
+  const fields=[];
+  for(const tok of spec.trim().split(/\s+/)){
+    if(ARGS[tok]){ for(const f of ARGS[tok]) fields.push({hi:f[0],lo:f[1],label:f[2],kind:f[3]}); continue; }
+    const m=tok.match(/^(\d+)(?:\.\.(\d+))?(?:=([0-9a-fx]+))?(?::(.+))?$/i);
+    if(!m) throw new Error("bad token "+tok);
+    const hi=+m[1], lo=m[2]!==undefined?+m[2]:hi;
+    if(m[3]!==undefined) fields.push({hi,lo,value:num(m[3]),cap:m[4]});
+    else fields.push({hi,lo,label:m[4],kind:kindOf(m[4])});
+  }
+  return fields.sort((a,b)=>b.hi-a.hi);
+}
+
+const groups=[]; let cur=null;
+for(const raw of document.getElementById("isa").textContent.split("\n")){
+  const line=raw.trim(); if(!line) continue;
+  if(line.startsWith("#")){
+    const [id,title,note]=line.slice(1).split("|").map(s=>s.trim());
+    cur={id,title,note,insns:[]}; groups.push(cur); continue;
+  }
+  const [,mn,fmt,asm,spec]=line.match(/^([^|]*)\|([^|]*)\|([^|]*)\|(.*)$/).map(s=>s.trim());
+  const fields=parseSpec(spec), width=fields[0].hi+1;
+  let match=0,mask=0;
+  for(const f of fields) if(f.value!==undefined){
+    mask+=((2**(f.hi-f.lo+1))-1)*(2**f.lo); match+=f.value*(2**f.lo);
+    const key=f.hi===f.lo?String(f.hi):f.hi+".."+f.lo;
+    if(!f.cap) f.cap=(width===32?CAP32:CAP16)[key]||"";
+    f.kind=(f.cap==="opcode"||f.cap==="op")?"op":"fix";
+  }
+  cur.insns.push({mn,fmt,asm,fields,width,match,mask,ext:cur.id});
+}
+
+// ---------- UI ----------
+const LS="rv32enc.v2";
+const state={hidden:{},q:"",mm:true,view:"ext",open:{},by:"op"};
+try{ Object.assign(state, JSON.parse(localStorage.getItem(LS)||"{}")); }catch(e){}
+// ?ext=RV32I,M preselects extensions (case-insensitive), e.g. for sharing a link.
+const want=new URLSearchParams(location.search).get("ext");
+const wantView=new URLSearchParams(location.search).get("view"), wantBy=new URLSearchParams(location.search).get("by");
+if(wantBy&&["op","f3","f7","f37"].includes(wantBy)) state.by=wantBy;
+if(wantView==="op"||wantView==="ext") state.view=wantView;
+if(want){ const set=new Set(want.toLowerCase().split(",").map(x=>x.trim())); state.hidden={}; groups.forEach(g=>{ if(!set.has(g.id.toLowerCase())) state.hidden[g.id]=true; }); }
+const save=()=>{ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} };
+const hex=(v,w)=>"0x"+(v>>>0).toString(16).padStart(w/4,"0");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const slug=id=>"ext-"+id.toLowerCase().replace(/[^a-z0-9]+/g,"-");
+
+function ruler(w){
+  const marks=w===32?[31,25,24,20,19,15,14,12,11,7,6,0]:[15,13,12,10,9,7,6,5,4,2,1,0];
+  let h='<div class="row ruler"><div class="meta rh">'+(w===32?"32-bit instruction":"16-bit compressed instruction")+'</div><div class="bits">';
+  if(w===16) h+='<div style="grid-column:span 16"></div>';
+  for(let b=w-1;b>=0;b--) h+='<div class="rul'+(marks.includes(b)?" hl":"")+'">'+b+'</div>';
+  return h+'</div></div>';
+}
+function fieldHtml(f){
+  const n=f.hi-f.lo+1, rng=f.hi===f.lo?"["+f.hi+"]":"["+f.hi+":"+f.lo+"]";
+  if(f.value!==undefined){
+    const bits=f.value.toString(2).padStart(n,"0");
+    const t=(f.cap?f.cap+" ":"")+"bits "+rng+" = "+bits+"b (0x"+f.value.toString(16)+")";
+    return '<div class="fld k-'+f.kind+'" style="grid-column:span '+n+'" title="'+esc(t)+'"><div class="digits">'+
+      [...bits].map(d=>"<span>"+d+"</span>").join("")+'</div><div class="c">'+esc(f.cap&&f.cap.length<=n*3+1?f.cap:"\u00a0")+'</div></div>';
+  }
+  // Narrow fields: show the bracket contents (e.g. "20") with the prefix ("imm") as caption.
+  let v=f.label, c=rng; const m=f.label.match(/^([^\[]+)\[(.+)\]$/);
+  if(m && f.label.length>n*3+1){ v=m[2]; c=m[1].length<=n*2?m[1]:"\u00a0"; }
+  return '<div class="fld k-'+f.kind+'" style="grid-column:span '+n+'" title="'+esc(f.label+" — bits "+rng)+'"><div class="v">'+esc(v)+
+    '</div><div class="c">'+esc(c)+'</div></div>';
+}
+const OPN={0x03:"LOAD",0x07:"LOAD-FP",0x0f:"MISC-MEM",0x13:"OP-IMM",0x17:"AUIPC",0x23:"STORE",0x27:"STORE-FP",0x2f:"AMO",
+  0x33:"OP",0x37:"LUI",0x43:"MADD",0x47:"MSUB",0x4b:"NMSUB",0x4f:"NMADD",0x53:"OP-FP",0x63:"BRANCH",0x67:"JALR",0x6f:"JAL",0x73:"SYSTEM"};
+// RVC opcode map (Table "RVC opcode map instructions"), indexed [op][funct3], RV32 column
+const CMAP=[["ADDI4SPN","FLD","LW","FLW","Reserved","FSD","SW","FSW"],
+            ["ADDI","JAL","LI","LUI/ADDI16SP","MISC-ALU","J","BEQZ","BNEZ"],
+            ["SLLI","FLDSP","LWSP","FLWSP","J[AL]R/MV/ADD","FSDSP","SWSP","FSWSP"]];
+// Value of bits hi..lo if they are all fixed for this instruction, else null.
+function bitsOf(i,hi,lo){ const m=(1<<(hi-lo+1))-1; return ((i.mask>>>lo)&m)===m?((i.match>>>lo)&m):null; }
+const BY={op:"Opcode",f3:"+ funct3",f7:"+ funct7",f37:"+ funct3 + funct7"};
+function opInfo(i){
+  if(i.width===32){
+    const v=i.match&0x7f, by=state.by, use3=by==="f3"||by==="f37", use7=by==="f7"||by==="f37";
+    let key="o"+v, sort=v*1e6; const sub=[], fld=["opcode [6:0]"];
+    if(use3){ const f=bitsOf(i,14,12); key+="_3"+(f===null?"x":f); sort+=(f===null?8:f)*1000; fld.push("funct3 [14:12]");
+      sub.push("funct3 "+(f===null?"—":"0b"+f.toString(2).padStart(3,"0"))); }
+    if(use7){ const f=bitsOf(i,31,25); key+="_7"+(f===null?"x":f); sort+=(f===null?128:f); fld.push("funct7 [31:25]");
+      sub.push("funct7 "+(f===null?"—":"0b"+f.toString(2).padStart(7,"0"))); }
+    return {key, sort, bin:"0b"+v.toString(2).padStart(7,"0"), hex:"0x"+v.toString(16).padStart(2,"0"), name:OPN[v]||"", sub:sub.join(" · "), field:fld.join(" · ")};
+  }
+  const q=i.match&3, f=(i.match>>>13)&7;
+  return {key:"c"+q+"_"+f, sort:256+q*8+f, bin:"0b"+f.toString(2).padStart(3,"0")+"…"+q.toString(2).padStart(2,"0"),
+    hex:"C"+q, name:"C."+CMAP[q][f], sub:"", field:"funct3 [15:13] · op [1:0]"};
+}
+function matches(i,q){
+  if(!q) return true;
+  if(i.mn.includes(q)||i.asm.toLowerCase().includes(q)) return true;
+  const o=opInfo(i); // also allow searching by opcode: "op-fp", "0b0110011", "0x33"
+  return o.name.toLowerCase()===q||o.bin.replace("…","")===q||o.hex===q;
+}
+function rowHtml(i,showExt){
+  return '<div class="row" id="row-'+esc(i.mn)+'"><div class="meta"><div class="l1"><span class="mn">'+esc(i.mn)+'</span><span class="fmt">'+esc(i.fmt)+'</span>'+
+    (showExt?'<span class="tag">'+esc(i.ext)+'</span>':"")+'</div>'+
+    '<code class="asm" title="'+esc(i.asm)+'">'+esc(i.asm)+'</code>'+
+    (state.mm?'<span class="mm">match '+hex(i.match,i.width)+' · mask '+hex(i.mask,i.width)+'</span>':"")+
+    '</div><div class="bits">'+(i.width===16?'<div style="grid-column:span 16"></div>':"")+i.fields.map(fieldHtml).join("")+'</div></div>';
+}
+function table(ins,showExt){ return '<div class="card"><div class="tbl">'+ruler(ins[0].width)+ins.map(i=>rowHtml(i,showExt)).join("")+'</div></div>'; }
+const CHEV='<svg class="chev" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5 7 5l-3.5 3.5"/></svg>';
+function renderExt(q){
+  let html="";
+  for(const g of groups){
+    if(state.hidden[g.id]) continue;
+    const ins=g.insns.filter(i=>matches(i,q));
+    if(!ins.length) continue;
+    html+='<section class="grp" id="'+slug(g.id)+'"><div class="grp-h"><span class="id">'+esc(g.id)+'</span><h2>'+esc(g.title)+'</h2></div>'+
+      (g.note?'<p class="grp-n">'+esc(g.note)+'</p>':"")+table(ins,false)+'</section>';
+  }
+  return html;
+}
+function renderOps(q){
+  const map=new Map(); let total=0;
+  for(const g of groups){
+    if(state.hidden[g.id]) continue;
+    for(const i of g.insns){
+      if(!matches(i,q)) continue;
+      const o=opInfo(i); total++;
+      if(!map.has(o.key)) map.set(o.key,Object.assign(o,{ins:[],exts:[]}));
+      const e=map.get(o.key); e.ins.push(i); if(!e.exts.includes(i.ext)) e.exts.push(i.ext);
+    }
+  }
+  const ops=[...map.values()].sort((a,b)=>a.sort-b.sort);
+  if(!ops.length) return "";
+  let html='<div class="ophead"><span>Group by</span><div class="seg" role="group" aria-label="Group by">'+
+    Object.entries(BY).map(([k,l])=>'<button data-by="'+k+'" aria-pressed="'+(state.by===k)+'">'+l+'</button>').join("")+'</div>'+
+    '<span>'+ops.length+' group'+(ops.length===1?"":"s")+' · '+total+' instruction'+(total===1?"":"s")+'</span>'+
+    '<span class="spacer"></span><button class="btn" data-act="expand">Expand All</button><button class="btn" data-act="collapse">Collapse All</button></div>';
+  for(const o of ops){
+    html+='<details class="op" data-key="'+o.key+'"'+(state.open[o.key]?" open":"")+'><summary>'+CHEV+'<div class="op-main"><div class="op-l1">'+
+      '<span class="op-dot"></span><code class="op-bin">'+esc(o.bin)+'</code><span class="op-name">'+esc(o.name)+'</span><span class="op-hex">'+esc(o.hex)+'</span>'+(o.sub?'<code class="op-sub">'+esc(o.sub)+'</code>':"")+
+      '<span class="badge">'+o.ins.length+'</span><span class="op-field">'+esc(o.field)+'</span>'+
+      '<span class="op-exts">'+o.exts.map(x=>'<span class="tag">'+esc(x)+'</span>').join("")+'</span></div>'+
+      '<div class="op-mns">'+o.ins.map(i=>'<button class="mnchip" data-mn="'+esc(i.mn)+'" title="'+esc(i.asm+"  ("+i.ext+")")+'">'+esc(i.mn)+'</button>').join("")+'</div>'+
+      '</div></summary><div class="op-body">'+table(o.ins,true)+'</div></details>';
+  }
+  return html;
+}
+function render(){
+  document.querySelectorAll(".toolbar .seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===state.view)));
+  const q=state.q.trim().toLowerCase();
+  const html=state.view==="op"?renderOps(q):renderExt(q);
+  document.getElementById("out").innerHTML=html||'<p class="empty">No instructions match.</p>';
+}
+function renderSidebar(){
+  document.getElementById("src").innerHTML=groups.map(g=>{
+    const on=!state.hidden[g.id];
+    return '<li class="'+(on?"":"off")+'" title="'+esc(g.title)+'"><input type="checkbox" data-id="'+esc(g.id)+'" aria-label="Show '+esc(g.id)+'"'+(on?" checked":"")+'>'+
+      '<button class="nm" data-jump="'+esc(g.id)+'">'+esc(g.id)+'</button><span class="badge">'+g.insns.length+'</span></li>';
+  }).join("");
+}
+const src=document.getElementById("src");
+src.addEventListener("change",e=>{
+  const id=e.target.dataset.id; if(!id) return;
+  state.hidden[id]=!e.target.checked; e.target.closest("li").classList.toggle("off",!e.target.checked); save(); render();
+});
+src.addEventListener("click",e=>{
+  const b=e.target.closest("[data-jump]"); if(!b) return;
+  const id=b.dataset.jump;
+  if(state.hidden[id]){ state.hidden[id]=false; renderSidebar(); }
+  if(state.hidden[id]===false||state.view!=="ext"){ state.view="ext"; save(); render(); }
+  const el=document.getElementById(slug(id));
+  if(el) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+});
+document.getElementById("all").onclick=()=>{state.hidden={};save();renderSidebar();render();};
+document.getElementById("none").onclick=()=>{groups.forEach(g=>state.hidden[g.id]=true);save();renderSidebar();render();};
+document.querySelector(".toolbar .seg").addEventListener("click",e=>{
+  const b=e.target.closest("[data-view]"); if(!b||b.dataset.view===state.view) return;
+  state.view=b.dataset.view; save(); render(); window.scrollTo(0,0);
+});
+const out=document.getElementById("out");
+out.addEventListener("toggle",e=>{
+  const d=e.target; if(!(d instanceof HTMLDetailsElement)||!d.dataset.key) return;
+  if(d.open) state.open[d.dataset.key]=true; else delete state.open[d.dataset.key];
+  save();
+},true);
+out.addEventListener("click",e=>{
+  const by=e.target.closest("[data-by]");
+  if(by){ state.by=by.dataset.by; state.open={}; save(); render(); return; }
+  const act=e.target.closest("[data-act]");
+  if(act){
+    const open=act.dataset.act==="expand";
+    out.querySelectorAll("details.op").forEach(d=>{ d.open=open; });
+    return;
+  }
+  const chip=e.target.closest(".mnchip"); if(!chip) return;
+  e.preventDefault(); // keep the summary from toggling; open it and jump to the row instead
+  const d=chip.closest("details"); d.open=true;
+  const row=document.getElementById("row-"+chip.dataset.mn); if(!row) return;
+  row.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
+  row.classList.remove("flash"); void row.offsetWidth; row.classList.add("flash");
+});
+const qi=document.getElementById("q"); qi.value=state.q;
+qi.addEventListener("input",()=>{state.q=qi.value;save();render();});
+qi.addEventListener("keydown",e=>{ if(e.key==="Escape"){ qi.value="";state.q="";save();render(); } });
+const mm=document.getElementById("showmm"); mm.checked=state.mm;
+mm.addEventListener("change",()=>{state.mm=mm.checked;save();render();});
+renderSidebar(); render();
+})();
+</script>
+</body>
+</html>

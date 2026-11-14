@@ -13,7 +13,7 @@
   --window:#f5f5f7; --content:#ffffff; --sidebar:rgba(236,236,240,.78); --toolbar:rgba(246,246,248,.82);
   --label:rgba(0,0,0,.86); --label2:rgba(0,0,0,.55); --label3:rgba(0,0,0,.32);
   --sep:rgba(0,0,0,.10); --sep-strong:rgba(0,0,0,.16); --fill:rgba(0,0,0,.05); --fill2:rgba(0,0,0,.035);
-  --accent:#007aff; --sel:rgba(0,122,255,.12); --seg-on:#ffffff;
+  --accent:#007aff; --sel:rgba(0,122,255,.12); --seg-on:#ffffff; --tip-bg:rgba(255,255,255,.94);
   --c-op:#af52de; --c-reg:#007aff; --c-imm:#ff9500; --c-oth:#28cd41; --c-fix:#8e8e93;
   --tint:17%; --shadow:0 0 0 .5px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.06);
 }
@@ -22,7 +22,7 @@
     --window:#1e1e1e; --content:#262626; --sidebar:rgba(40,40,42,.78); --toolbar:rgba(38,38,40,.82);
     --label:rgba(255,255,255,.86); --label2:rgba(255,255,255,.55); --label3:rgba(255,255,255,.28);
     --sep:rgba(255,255,255,.10); --sep-strong:rgba(255,255,255,.16); --fill:rgba(255,255,255,.07); --fill2:rgba(255,255,255,.04);
-    --accent:#0a84ff; --sel:rgba(10,132,255,.22); --seg-on:#5b5b5f;
+    --accent:#0a84ff; --sel:rgba(10,132,255,.22); --seg-on:#5b5b5f; --tip-bg:rgba(52,52,54,.94);
     --c-op:#bf5af2; --c-reg:#0a84ff; --c-imm:#ff9f0a; --c-oth:#32d74b; --c-fix:#98989d;
     --tint:24%; --shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 3px rgba(0,0,0,.4);
   }
@@ -31,7 +31,7 @@
   --window:#1e1e1e; --content:#262626; --sidebar:rgba(40,40,42,.78); --toolbar:rgba(38,38,40,.82);
   --label:rgba(255,255,255,.86); --label2:rgba(255,255,255,.55); --label3:rgba(255,255,255,.28);
   --sep:rgba(255,255,255,.10); --sep-strong:rgba(255,255,255,.16); --fill:rgba(255,255,255,.07); --fill2:rgba(255,255,255,.04);
-  --accent:#0a84ff; --sel:rgba(10,132,255,.22); --seg-on:#5b5b5f;
+  --accent:#0a84ff; --sel:rgba(10,132,255,.22); --seg-on:#5b5b5f; --tip-bg:rgba(52,52,54,.94);
   --c-op:#bf5af2; --c-reg:#0a84ff; --c-imm:#ff9f0a; --c-oth:#32d74b; --c-fix:#98989d;
   --tint:24%; --shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 3px rgba(0,0,0,.4);
 }
@@ -153,6 +153,16 @@ details.op[open]>summary .chev{transform:rotate(90deg)}
 @keyframes flash{from{background:var(--sel)}to{background:transparent}}
 .row.flash{animation:flash 1.8s ease-out}
 
+/* Instruction description popover */
+.tip{position:fixed;left:0;top:0;z-index:50;max-width:400px;padding:8px 11px 9px;border-radius:8px;background:var(--tip-bg);
+  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+  box-shadow:0 0 0 .5px var(--sep-strong),0 8px 24px rgba(0,0,0,.18);font-size:12px;line-height:1.45;color:var(--label);
+  opacity:0;pointer-events:none;transition:opacity .12s}
+.tip.on{opacity:1}
+.tip-h{display:flex;gap:8px;align-items:center;margin-bottom:3px}
+.tip-h code{font-weight:600;font-size:12px}
+[data-tip].mn,[data-tip].mnchip{text-decoration:underline dotted var(--label3);text-underline-offset:3px}
+
 /* Narrow windows: sidebar becomes a horizontal source strip */
 @media (max-width:760px){
   .toolbar{height:auto;flex-wrap:wrap;padding:8px 16px;gap:8px}
@@ -206,9 +216,224 @@ details.op[open]>summary .chev{transform:rotate(90deg)}
   </nav>
   <main class="content">
     <div id="out"></div>
-    <p class="foot">Encodings checked against the RISC-V Unprivileged ISA manual (v20260120): Ch. 36 instruction listings (RV32I, Zifencei, Zicsr, M, A, F, D), RVC listing figures (C) and per-instruction encodings (Zicond, Zba/Zbb/Zbc/Zbs). The privileged groups (Priv, Smrnmi, Smctr, Svinval, H) were checked against the Vol. II Ch. 19 privileged instruction listings. F/D register fields name f-registers where the syntax says <code>fd</code>/<code>fs1</code>/…; hover over a field to see its bit range and value. Append <code>?ext=RV32I,M,C</code> to the URL to open with only those extensions shown, and <code>&amp;view=op</code> for the opcode view (plus <code>&amp;by=f3</code>, <code>f7</code> or <code>f37</code> to group by funct3/funct7 as well). In the opcode view, C instructions are grouped by their RVC opcode-map cell (funct3 + op); the search field also accepts an opcode such as <code>op-fp</code>, <code>0x33</code> or <code>0b0110011</code>.</p>
+    <p class="foot">Encodings checked against the RISC-V Unprivileged ISA manual (v20260120): Ch. 36 instruction listings (RV32I, Zifencei, Zicsr, M, A, F, D), RVC listing figures (C) and per-instruction encodings (Zicond, Zba/Zbb/Zbc/Zbs). The privileged groups (Priv, Smrnmi, Smctr, Svinval, H) were checked against the Vol. II Ch. 19 privileged instruction listings. F/D register fields name f-registers where the syntax says <code>fd</code>/<code>fs1</code>/…; hover over a mnemonic or its syntax for a description of the instruction, and over a field to see its bit range and value. Append <code>?ext=RV32I,M,C</code> to the URL to open with only those extensions shown, and <code>&amp;view=op</code> for the opcode view (plus <code>&amp;by=f3</code>, <code>f7</code> or <code>f37</code> to group by funct3/funct7 as well). In the opcode view, C instructions are grouped by their RVC opcode-map cell (funct3 + op); the search field also accepts an opcode such as <code>op-fp</code>, <code>0x33</code> or <code>0b0110011</code>.</p>
   </main>
 </div>
+
+<script id="desc" type="text/plain">
+lui|Load upper immediate: rd = imm20 << 12; the lower 12 bits are zero. Together with addi it builds any 32-bit constant.
+auipc|Add upper immediate to PC: rd = pc + (imm20 << 12). Used for PC-relative addressing (with jalr, loads/stores or addi).
+jal|Jump and link: rd = pc + 4; pc = pc + sext(offset). Range ±1 MiB. jal x0, offset is the pseudo-instruction j.
+jalr|Jump and link register: t = pc + 4; pc = (rs1 + sext(offset)) & ~1; rd = t. jalr x0, 0(x1) is ret.
+beq|Branch if equal: if (rs1 == rs2) pc = pc + sext(offset). Range ±4 KiB.
+bne|Branch if not equal: if (rs1 != rs2) pc = pc + sext(offset). Range ±4 KiB.
+blt|Branch if less than (signed): if (rs1 < rs2) pc = pc + sext(offset). bgt is blt with swapped operands.
+bge|Branch if greater than or equal (signed): if (rs1 >= rs2) pc = pc + sext(offset). ble is bge with swapped operands.
+bltu|Branch if less than (unsigned): if (rs1 <u rs2) pc = pc + sext(offset).
+bgeu|Branch if greater than or equal (unsigned): if (rs1 >=u rs2) pc = pc + sext(offset).
+lb|Load byte: rd = sext(M[rs1 + sext(offset)][7:0]).
+lh|Load halfword: rd = sext(M[rs1 + sext(offset)][15:0]).
+lw|Load word: rd = M[rs1 + sext(offset)][31:0].
+lbu|Load byte unsigned: rd = zext(M[rs1 + sext(offset)][7:0]).
+lhu|Load halfword unsigned: rd = zext(M[rs1 + sext(offset)][15:0]).
+sb|Store byte: M[rs1 + sext(offset)][7:0] = rs2[7:0].
+sh|Store halfword: M[rs1 + sext(offset)][15:0] = rs2[15:0].
+sw|Store word: M[rs1 + sext(offset)][31:0] = rs2.
+addi|Add immediate: rd = rs1 + sext(imm12); overflow is ignored. addi x0, x0, 0 is the canonical nop, addi rd, rs1, 0 is mv.
+slti|Set less than immediate (signed): rd = (rs1 < sext(imm12)) ? 1 : 0.
+sltiu|Set less than immediate unsigned: rd = (rs1 <u sext(imm12)) ? 1 : 0. sltiu rd, rs1, 1 is seqz.
+xori|XOR immediate: rd = rs1 ^ sext(imm12). xori rd, rs1, -1 is not.
+ori|OR immediate: rd = rs1 | sext(imm12).
+andi|AND immediate: rd = rs1 & sext(imm12).
+slli|Shift left logical immediate: rd = rs1 << shamt.
+srli|Shift right logical immediate: rd = rs1 >>u shamt (zeros shifted in).
+srai|Shift right arithmetic immediate: rd = rs1 >>s shamt (sign bit shifted in).
+add|Add: rd = rs1 + rs2; overflow is ignored.
+sub|Subtract: rd = rs1 - rs2; overflow is ignored. sub rd, x0, rs2 is neg.
+sll|Shift left logical: rd = rs1 << rs2[4:0].
+slt|Set less than (signed): rd = (rs1 < rs2) ? 1 : 0.
+sltu|Set less than unsigned: rd = (rs1 <u rs2) ? 1 : 0. sltu rd, x0, rs2 is snez.
+xor|Exclusive OR: rd = rs1 ^ rs2.
+srl|Shift right logical: rd = rs1 >>u rs2[4:0].
+sra|Shift right arithmetic: rd = rs1 >>s rs2[4:0].
+or|OR: rd = rs1 | rs2.
+and|AND: rd = rs1 & rs2.
+fence|Memory ordering fence: all predecessor accesses of the kinds in pred (I/O/R/W) are ordered before all successor accesses of the kinds in succ, as observed by other harts and devices.
+fence.tso|Fence with total-store-ordering semantics (fm=1000, pred=succ=RW): orders loads before loads and stores, and stores before stores, but not stores before later loads.
+ecall|Environment call: raises an environment-call exception to request a service from the execution environment (e.g. a system call).
+ebreak|Environment breakpoint: raises a breakpoint exception to return control to a debugger.
+fence.i|Instruction-fetch fence: makes earlier stores to instruction memory by this hart visible to its later instruction fetches (needed for self-modifying code).
+csrrw|Atomic read/write CSR: t = CSR; CSR = rs1; rd = t. If rd = x0 the CSR is not read (csrw).
+csrrs|Atomic read and set bits in CSR: t = CSR; CSR = t | rs1; rd = t. If rs1 = x0 the CSR is not written (csrr).
+csrrc|Atomic read and clear bits in CSR: t = CSR; CSR = t & ~rs1; rd = t. If rs1 = x0 the CSR is not written.
+csrrwi|Atomic read/write CSR immediate: t = CSR; CSR = zext(uimm); rd = t. If rd = x0 the CSR is not read.
+csrrsi|Atomic read and set bits in CSR immediate: t = CSR; CSR = t | zext(uimm); rd = t. If uimm = 0 the CSR is not written.
+csrrci|Atomic read and clear bits in CSR immediate: t = CSR; CSR = t & ~zext(uimm); rd = t. If uimm = 0 the CSR is not written.
+pause|Pause hint: the hart may temporarily reduce its instruction retire rate, e.g. inside spin-wait loops. Executes as a no-op where unsupported.
+mul|Multiply: rd = (rs1 × rs2)[31:0], the lower 32 bits (identical for signed and unsigned operands).
+mulh|Multiply high signed: rd = (sext(rs1) × sext(rs2))[63:32].
+mulhsu|Multiply high signed × unsigned: rd = (sext(rs1) × zext(rs2))[63:32].
+mulhu|Multiply high unsigned: rd = (zext(rs1) × zext(rs2))[63:32].
+div|Divide signed, rounding toward zero: rd = rs1 / rs2. Division by zero gives -1; overflow (-2^31 / -1) gives -2^31. No exception is raised.
+divu|Divide unsigned: rd = rs1 /u rs2. Division by zero gives 2^32-1.
+rem|Remainder signed: rd = rs1 % rs2; the result has the sign of the dividend. Division by zero gives rs1; overflow gives 0.
+remu|Remainder unsigned: rd = rs1 %u rs2. Division by zero gives rs1.
+lr.w|Load-reserved word: rd = M[rs1]; registers a reservation on that address for a following sc.w.
+sc.w|Store-conditional word: if the reservation on M[rs1] is still valid, M[rs1] = rs2 and rd = 0; otherwise nothing is stored and rd ≠ 0. The reservation is cleared either way.
+amoswap.w|Atomic swap: t = M[rs1]; M[rs1] = rs2; rd = t, as one atomic operation.
+amoadd.w|Atomic add: t = M[rs1]; M[rs1] = t + rs2; rd = t, as one atomic operation.
+amoxor.w|Atomic XOR: t = M[rs1]; M[rs1] = t ^ rs2; rd = t, as one atomic operation.
+amoand.w|Atomic AND: t = M[rs1]; M[rs1] = t & rs2; rd = t, as one atomic operation.
+amoor.w|Atomic OR: t = M[rs1]; M[rs1] = t | rs2; rd = t, as one atomic operation.
+amomin.w|Atomic signed minimum: t = M[rs1]; M[rs1] = min(t, rs2); rd = t, as one atomic operation.
+amomax.w|Atomic signed maximum: t = M[rs1]; M[rs1] = max(t, rs2); rd = t, as one atomic operation.
+amominu.w|Atomic unsigned minimum: t = M[rs1]; M[rs1] = minu(t, rs2); rd = t, as one atomic operation.
+amomaxu.w|Atomic unsigned maximum: t = M[rs1]; M[rs1] = maxu(t, rs2); rd = t, as one atomic operation.
+flw|Load single-precision float: fd = M[rs1 + sext(offset)][31:0].
+fsw|Store single-precision float: M[rs1 + sext(offset)] = fs2[31:0].
+fmadd.s|Fused multiply-add (single): fd = fs1 × fs2 + fs3 with a single rounding (rm).
+fmsub.s|Fused multiply-subtract (single): fd = fs1 × fs2 - fs3 with a single rounding.
+fnmsub.s|Negated fused multiply-subtract (single): fd = -(fs1 × fs2) + fs3 with a single rounding.
+fnmadd.s|Negated fused multiply-add (single): fd = -(fs1 × fs2) - fs3 with a single rounding.
+fadd.s|Add (single): fd = fs1 + fs2, rounded per rm.
+fsub.s|Subtract (single): fd = fs1 - fs2, rounded per rm.
+fmul.s|Multiply (single): fd = fs1 × fs2, rounded per rm.
+fdiv.s|Divide (single): fd = fs1 / fs2, rounded per rm.
+fsqrt.s|Square root (single): fd = sqrt(fs1), rounded per rm.
+fsgnj.s|Sign injection (single): fd = |fs1| with the sign of fs2. fsgnj.s fd, fs, fs is fmv.s.
+fsgnjn.s|Negated sign injection (single): fd = |fs1| with the inverted sign of fs2. fsgnjn.s fd, fs, fs is fneg.s.
+fsgnjx.s|XOR sign injection (single): fd = fs1 with sign = sign(fs1) XOR sign(fs2). fsgnjx.s fd, fs, fs is fabs.s.
+fmin.s|Minimum (single): fd = min(fs1, fs2); -0.0 < +0.0, and if only one input is NaN the other is returned.
+fmax.s|Maximum (single): fd = max(fs1, fs2); -0.0 < +0.0, and if only one input is NaN the other is returned.
+fcvt.w.s|Convert single to signed int32: rd = (int32) fs1, rounded per rm; out-of-range values saturate.
+fcvt.wu.s|Convert single to unsigned uint32: rd = (uint32) fs1, rounded per rm; out-of-range values saturate.
+fmv.x.w|Move bit pattern from float to integer register: rd = fs1[31:0], without conversion.
+feq.s|Compare equal (single): rd = (fs1 == fs2) ? 1 : 0. Quiet comparison; any NaN gives 0.
+flt.s|Compare less than (single): rd = (fs1 < fs2) ? 1 : 0. Any NaN gives 0 and raises the invalid flag.
+fle.s|Compare less or equal (single): rd = (fs1 <= fs2) ? 1 : 0. Any NaN gives 0 and raises the invalid flag.
+fclass.s|Classify (single): rd = one-hot 10-bit mask: -inf, -normal, -subnormal, -0, +0, +subnormal, +normal, +inf, signaling NaN, quiet NaN.
+fcvt.s.w|Convert signed int32 to single: fd = (float) rs1, rounded per rm.
+fcvt.s.wu|Convert unsigned uint32 to single: fd = (float) rs1, rounded per rm.
+fmv.w.x|Move bit pattern from integer to float register: fd = rs1[31:0], without conversion.
+fld|Load double-precision float: fd = M[rs1 + sext(offset)][63:0].
+fsd|Store double-precision float: M[rs1 + sext(offset)] = fs2[63:0].
+fmadd.d|Fused multiply-add (double): fd = fs1 × fs2 + fs3 with a single rounding (rm).
+fmsub.d|Fused multiply-subtract (double): fd = fs1 × fs2 - fs3 with a single rounding.
+fnmsub.d|Negated fused multiply-subtract (double): fd = -(fs1 × fs2) + fs3 with a single rounding.
+fnmadd.d|Negated fused multiply-add (double): fd = -(fs1 × fs2) - fs3 with a single rounding.
+fadd.d|Add (double): fd = fs1 + fs2, rounded per rm.
+fsub.d|Subtract (double): fd = fs1 - fs2, rounded per rm.
+fmul.d|Multiply (double): fd = fs1 × fs2, rounded per rm.
+fdiv.d|Divide (double): fd = fs1 / fs2, rounded per rm.
+fsqrt.d|Square root (double): fd = sqrt(fs1), rounded per rm.
+fsgnj.d|Sign injection (double): fd = |fs1| with the sign of fs2. fsgnj.d fd, fs, fs is fmv.d.
+fsgnjn.d|Negated sign injection (double): fd = |fs1| with the inverted sign of fs2. fsgnjn.d fd, fs, fs is fneg.d.
+fsgnjx.d|XOR sign injection (double): fd = fs1 with sign = sign(fs1) XOR sign(fs2). fsgnjx.d fd, fs, fs is fabs.d.
+fmin.d|Minimum (double): fd = min(fs1, fs2); -0.0 < +0.0, and if only one input is NaN the other is returned.
+fmax.d|Maximum (double): fd = max(fs1, fs2); -0.0 < +0.0, and if only one input is NaN the other is returned.
+fcvt.s.d|Convert double to single: fd = (float) fs1, rounded per rm.
+fcvt.d.s|Convert single to double: fd = (double) fs1 (always exact).
+feq.d|Compare equal (double): rd = (fs1 == fs2) ? 1 : 0. Quiet comparison; any NaN gives 0.
+flt.d|Compare less than (double): rd = (fs1 < fs2) ? 1 : 0. Any NaN gives 0 and raises the invalid flag.
+fle.d|Compare less or equal (double): rd = (fs1 <= fs2) ? 1 : 0. Any NaN gives 0 and raises the invalid flag.
+fclass.d|Classify (double): rd = one-hot 10-bit mask: -inf, -normal, -subnormal, -0, +0, +subnormal, +normal, +inf, signaling NaN, quiet NaN.
+fcvt.w.d|Convert double to signed int32: rd = (int32) fs1, rounded per rm; out-of-range values saturate.
+fcvt.wu.d|Convert double to unsigned uint32: rd = (uint32) fs1, rounded per rm; out-of-range values saturate.
+fcvt.d.w|Convert signed int32 to double: fd = (double) rs1 (always exact).
+fcvt.d.wu|Convert unsigned uint32 to double: fd = (double) rs1 (always exact).
+czero.eqz|Conditional zero if equal to zero: rd = (rs2 == 0) ? 0 : rs1.
+czero.nez|Conditional zero if not equal to zero: rd = (rs2 != 0) ? 0 : rs1.
+sh1add|Shift left by 1 and add: rd = (rs1 << 1) + rs2. Indexes an array of halfwords.
+sh2add|Shift left by 2 and add: rd = (rs1 << 2) + rs2. Indexes an array of words.
+sh3add|Shift left by 3 and add: rd = (rs1 << 3) + rs2. Indexes an array of doublewords.
+andn|AND with inverted operand: rd = rs1 & ~rs2.
+orn|OR with inverted operand: rd = rs1 | ~rs2.
+xnor|Exclusive NOR: rd = ~(rs1 ^ rs2).
+clz|Count leading zeros: rd = number of 0 bits above the most significant 1 bit of rs1 (32 if rs1 = 0).
+ctz|Count trailing zeros: rd = number of 0 bits below the least significant 1 bit of rs1 (32 if rs1 = 0).
+cpop|Population count: rd = number of 1 bits in rs1.
+max|Maximum (signed): rd = (rs1 > rs2) ? rs1 : rs2.
+maxu|Maximum (unsigned): rd = (rs1 >u rs2) ? rs1 : rs2.
+min|Minimum (signed): rd = (rs1 < rs2) ? rs1 : rs2.
+minu|Minimum (unsigned): rd = (rs1 <u rs2) ? rs1 : rs2.
+sext.b|Sign-extend byte: rd = sext(rs1[7:0]).
+sext.h|Sign-extend halfword: rd = sext(rs1[15:0]).
+zext.h|Zero-extend halfword: rd = zext(rs1[15:0]).
+rol|Rotate left: rd = (rs1 << rs2[4:0]) | (rs1 >>u (32 - rs2[4:0])).
+ror|Rotate right: rd = (rs1 >>u rs2[4:0]) | (rs1 << (32 - rs2[4:0])).
+rori|Rotate right immediate: rd = (rs1 >>u shamt) | (rs1 << (32 - shamt)).
+orc.b|OR-combine bytes: each byte of rd = 0xFF if the corresponding byte of rs1 is nonzero, else 0x00. Speeds up strlen/strcmp.
+rev8|Byte-reverse: rd = rs1 with its four bytes in reverse order (endianness swap).
+clmul|Carry-less multiply, low half: rd = (rs1 ⊗ rs2)[31:0], where partial products are XORed instead of added.
+clmulr|Carry-less multiply, reversed: rd = (rs1 ⊗ rs2)[62:31].
+clmulh|Carry-less multiply, high half: rd = (rs1 ⊗ rs2)[63:32].
+bclr|Clear bit: rd = rs1 & ~(1 << rs2[4:0]).
+bclri|Clear bit immediate: rd = rs1 & ~(1 << shamt).
+bext|Extract bit: rd = (rs1 >> rs2[4:0]) & 1.
+bexti|Extract bit immediate: rd = (rs1 >> shamt) & 1.
+binv|Invert bit: rd = rs1 ^ (1 << rs2[4:0]).
+binvi|Invert bit immediate: rd = rs1 ^ (1 << shamt).
+bset|Set bit: rd = rs1 | (1 << rs2[4:0]).
+bseti|Set bit immediate: rd = rs1 | (1 << shamt).
+c.addi4spn|Add scaled immediate to stack pointer: rd' = sp + nzuimm (multiple of 4). Expands to addi rd', x2, nzuimm. Takes addresses of stack-allocated variables.
+c.fld|Expands to fld fd', uimm(rs1'); the offset is a multiple of 8.
+c.lw|Expands to lw rd', uimm(rs1'); the offset is a multiple of 4.
+c.flw|Expands to flw fd', uimm(rs1'); the offset is a multiple of 4 (RV32 only).
+c.fsd|Expands to fsd fs2', uimm(rs1'); the offset is a multiple of 8.
+c.sw|Expands to sw rs2', uimm(rs1'); the offset is a multiple of 4.
+c.fsw|Expands to fsw fs2', uimm(rs1'); the offset is a multiple of 4 (RV32 only).
+c.nop|No operation. Expands to addi x0, x0, 0.
+c.addi|Expands to addi rd, rd, nzimm (6-bit signed, nonzero).
+c.jal|Expands to jal x1, offset (±2 KiB). RV32 only.
+c.li|Load immediate: expands to addi rd, x0, imm (6-bit signed).
+c.addi16sp|Adjust the stack pointer: expands to addi x2, x2, nzimm (multiple of 16, range -512..496).
+c.lui|Expands to lui rd, nzimm (rd ≠ x0, x2; 6-bit nonzero immediate, sign-extended).
+c.srli|Expands to srli rd', rd', shamt.
+c.srai|Expands to srai rd', rd', shamt.
+c.andi|Expands to andi rd', rd', imm (6-bit signed).
+c.sub|Expands to sub rd', rd', rs2'.
+c.xor|Expands to xor rd', rd', rs2'.
+c.or|Expands to or rd', rd', rs2'.
+c.and|Expands to and rd', rd', rs2'.
+c.j|Expands to jal x0, offset (±2 KiB).
+c.beqz|Expands to beq rs1', x0, offset (±256 B).
+c.bnez|Expands to bne rs1', x0, offset (±256 B).
+c.slli|Expands to slli rd, rd, shamt.
+c.fldsp|Expands to fld fd, uimm(x2); the offset is a multiple of 8.
+c.lwsp|Expands to lw rd, uimm(x2); the offset is a multiple of 4 (rd ≠ x0).
+c.flwsp|Expands to flw fd, uimm(x2); the offset is a multiple of 4 (RV32 only).
+c.jr|Expands to jalr x0, 0(rs1) (rs1 ≠ x0).
+c.mv|Expands to add rd, x0, rs2 (rs2 ≠ x0).
+c.ebreak|Expands to ebreak.
+c.jalr|Expands to jalr x1, 0(rs1) (rs1 ≠ x0).
+c.add|Expands to add rd, rd, rs2 (rs2 ≠ x0).
+c.fsdsp|Expands to fsd fs2, uimm(x2); the offset is a multiple of 8.
+c.swsp|Expands to sw rs2, uimm(x2); the offset is a multiple of 4.
+c.fswsp|Expands to fsw fs2, uimm(x2); the offset is a multiple of 4 (RV32 only).
+mret|Return from an M-mode trap: pc = mepc; privilege = mstatus.MPP; MIE = MPIE; MPIE = 1; MPP = least-privileged supported mode.
+sret|Return from an S-mode trap: pc = sepc; privilege = sstatus.SPP; SIE = SPIE; SPIE = 1; SPP = U.
+wfi|Wait for interrupt: hint that the hart may stall until an interrupt might need servicing. Can legally be implemented as a no-op.
+sfence.vma|Supervisor memory-management fence: orders earlier page-table stores before later implicit accesses and flushes address-translation caches for the virtual address in rs1 (x0 = all) and ASID in rs2 (x0 = all).
+mnret|Return from a resumable NMI handler: pc = mnepc; privilege = mnstatus.MNPP; mnstatus.NMIE = 1.
+sctrclr|Clear control-transfer records: zeros all CTR buffer entries and resets the CTR state.
+sinval.vma|Invalidate address-translation cache entries like sfence.vma, but without ordering. Bracket with sfence.w.inval and sfence.inval.ir.
+sfence.w.inval|Orders earlier stores (e.g. page-table updates) before later sinval.vma / hinval.* invalidations.
+sfence.inval.ir|Orders earlier sinval.vma / hinval.* invalidations before later implicit memory accesses.
+hinval.vvma|Invalidate VS-stage translation cache entries like hfence.vvma, but without ordering (Svinval + H).
+hinval.gvma|Invalidate G-stage translation cache entries like hfence.gvma, but without ordering (Svinval + H).
+hfence.vvma|Hypervisor fence for VS-stage translations: like sfence.vma for the current guest (rs1 = guest virtual address, rs2 = ASID; x0 = all).
+hfence.gvma|Hypervisor fence for G-stage translations: rs1 = guest physical address >> 2, rs2 = VMID (x0 = all).
+hlv.b|Hypervisor load byte as the guest: rd = sext(M[rs1][7:0]), translated and checked as in VS/VU mode (V=1).
+hlv.bu|Hypervisor load byte unsigned as the guest: rd = zext(M[rs1][7:0]), translated and checked as in VS/VU mode.
+hlv.h|Hypervisor load halfword as the guest: rd = sext(M[rs1][15:0]), translated and checked as in VS/VU mode.
+hlv.hu|Hypervisor load halfword unsigned as the guest: rd = zext(M[rs1][15:0]), translated and checked as in VS/VU mode.
+hlvx.hu|Like hlv.hu, but requires execute permission instead of read permission (for reading guest instructions).
+hlv.w|Hypervisor load word as the guest: rd = M[rs1][31:0], translated and checked as in VS/VU mode.
+hlvx.wu|Like hlv.w, but requires execute permission instead of read permission (for reading guest instructions).
+hsv.b|Hypervisor store byte as the guest: M[rs1][7:0] = rs2[7:0], translated and checked as in VS/VU mode.
+hsv.h|Hypervisor store halfword as the guest: M[rs1][15:0] = rs2[15:0], translated and checked as in VS/VU mode.
+hsv.w|Hypervisor store word as the guest: M[rs1][31:0] = rs2, translated and checked as in VS/VU mode.
+</script>
 
 <script id="isa" type="text/plain">
 # RV32I | RV32I Base Integer | Ch. 1 – the 40 base instructions plus FENCE.TSO (a FENCE encoding with fm=1000)
@@ -581,9 +806,9 @@ function matches(i,q){
   return o.name.toLowerCase()===q||o.bin.replace("…","")===q||o.hex===q;
 }
 function rowHtml(i,showExt){
-  return '<div class="row" id="row-'+esc(i.mn)+'"><div class="meta"><div class="l1"><span class="mn">'+esc(i.mn)+'</span><span class="fmt">'+esc(i.fmt)+'</span>'+
+  return '<div class="row" id="row-'+esc(i.mn)+'"><div class="meta"><div class="l1"><span class="mn" data-tip="'+esc(i.mn)+'">'+esc(i.mn)+'</span><span class="fmt">'+esc(i.fmt)+'</span>'+
     (showExt?'<span class="tag">'+esc(i.ext)+'</span>':"")+'</div>'+
-    '<code class="asm" title="'+esc(i.asm)+'">'+esc(i.asm)+'</code>'+
+    '<code class="asm" data-tip="'+esc(i.mn)+'">'+esc(i.asm)+'</code>'+
     (state.mm?'<span class="mm">match '+hex(i.match,i.width)+' · mask '+hex(i.mask,i.width)+'</span>':"")+
     '</div><div class="bits">'+(i.width===16?'<div style="grid-column:span 16"></div>':"")+i.fields.map(fieldHtml).join("")+'</div></div>';
 }
@@ -622,7 +847,7 @@ function renderOps(q){
       '<span class="op-dot"></span><code class="op-bin">'+esc(o.bin)+'</code><span class="op-name">'+esc(o.name)+'</span><span class="op-hex">'+esc(o.hex)+'</span>'+(o.sub?'<code class="op-sub">'+esc(o.sub)+'</code>':"")+
       '<span class="badge">'+o.ins.length+'</span><span class="op-field">'+esc(o.field)+'</span>'+
       '<span class="op-exts">'+o.exts.map(x=>'<span class="tag">'+esc(x)+'</span>').join("")+'</span></div>'+
-      '<div class="op-mns">'+o.ins.map(i=>'<button class="mnchip" data-mn="'+esc(i.mn)+'" title="'+esc(i.asm+"  ("+i.ext+")")+'">'+esc(i.mn)+'</button>').join("")+'</div>'+
+      '<div class="op-mns">'+o.ins.map(i=>'<button class="mnchip" data-mn="'+esc(i.mn)+'" data-tip="'+esc(i.mn)+'">'+esc(i.mn)+'</button>').join("")+'</div>'+
       '</div></summary><div class="op-body">'+table(o.ins,true)+'</div></details>';
   }
   return html;
@@ -686,6 +911,38 @@ qi.addEventListener("input",()=>{state.q=qi.value;save();render();});
 qi.addEventListener("keydown",e=>{ if(e.key==="Escape"){ qi.value="";state.q="";save();render(); } });
 const mm=document.getElementById("showmm"); mm.checked=state.mm;
 mm.addEventListener("change",()=>{state.mm=mm.checked;save();render();});
+// ---------- Description tooltips ----------
+const DESC={};
+for(const raw of document.getElementById("desc").textContent.split("\n")){
+  const m=raw.match(/^([^|]+)\|(.*)$/); if(m) DESC[m[1].trim()]=m[2].trim();
+}
+const BYMN={}; groups.forEach(g=>g.insns.forEach(i=>{ BYMN[i.mn]=i; }));
+const tip=document.createElement("div"); tip.className="tip"; tip.id="tip"; tip.setAttribute("role","tooltip");
+document.body.appendChild(tip);
+let tipTimer=null, tipFor=null;
+function showTip(el){
+  const i=BYMN[el.dataset.tip]; if(!i) return;
+  tip.innerHTML='<div class="tip-h"><code>'+esc(i.asm)+'</code><span class="tag">'+esc(i.ext)+'</span></div><div>'+esc(DESC[i.mn]||"No description available.")+'</div>';
+  const r=el.getBoundingClientRect(), tw=tip.offsetWidth, th=tip.offsetHeight;
+  const x=Math.min(Math.max(8,r.left), innerWidth-tw-8);
+  let y=r.bottom+6; if(y+th>innerHeight-8) y=Math.max(8,r.top-th-6);
+  tip.style.left=x+"px"; tip.style.top=y+"px"; tip.classList.add("on");
+  tipFor=el; el.setAttribute("aria-describedby","tip");
+}
+function hideTip(){
+  clearTimeout(tipTimer); tip.classList.remove("on");
+  if(tipFor){ tipFor.removeAttribute("aria-describedby"); tipFor=null; }
+}
+document.addEventListener("mouseover",e=>{
+  const el=e.target.closest("[data-tip]"); if(el&&el===tipFor) return;
+  hideTip(); if(el) tipTimer=setTimeout(()=>showTip(el),350);
+});
+document.addEventListener("focusin",e=>{ const el=e.target.closest("[data-tip]"); hideTip(); if(el) showTip(el); });
+document.addEventListener("focusout",hideTip);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") hideTip(); });
+addEventListener("scroll",hideTip,true);
+window.__showTip=showTip; // used by self-checks
+
 renderSidebar(); render();
 })();
 </script>

@@ -6,106 +6,138 @@
 <meta name="color-scheme" content="light dark">
 <title>RV32 Instruction Encodings</title>
 <style>
-/* Tokens follow macOS system colors (light / dark appearance). */
+/* ---------- Tokens: macOS system colors + Liquid Glass materials ---------- */
 :root{
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","Inter",system-ui,sans-serif;
   --mono:ui-monospace,"SF Mono",Menlo,"JetBrains Mono",Consolas,monospace;
-  --window:#f5f5f7; --content:#ffffff; --sidebar:rgba(236,236,240,.78); --toolbar:rgba(246,246,248,.82);
-  --label:rgba(0,0,0,.86); --label2:rgba(0,0,0,.55); --label3:rgba(0,0,0,.32);
-  --sep:rgba(0,0,0,.10); --sep-strong:rgba(0,0,0,.16); --fill:rgba(0,0,0,.05); --fill2:rgba(0,0,0,.035);
-  --accent:#007aff; --sel:rgba(0,122,255,.12); --seg-on:#ffffff; --tip-bg:rgba(255,255,255,.94);
-  --c-op:#af52de; --c-reg:#007aff; --c-imm:#ff9500; --c-oth:#28cd41; --c-fix:#8e8e93;
-  --tint:17%; --shadow:0 0 0 .5px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.06);
+  --bg:#eef0f4; --wash1:rgba(0,122,255,.10); --wash2:rgba(175,82,222,.09); --wash3:rgba(52,199,89,.07);
+  --content:#ffffff; --label:rgba(0,0,0,.86); --label2:rgba(0,0,0,.55); --label3:rgba(0,0,0,.32);
+  --sep:rgba(0,0,0,.09); --sep-strong:rgba(0,0,0,.15); --fill:rgba(0,0,0,.05); --fill2:rgba(0,0,0,.03);
+  --accent:#007aff; --sel:rgba(0,122,255,.13);
+  --c-op:#af52de; --c-reg:#007aff; --c-imm:#ff9500; --c-oth:#28cd41; --c-fix:#8e8e93; --tint:17%;
+  --card-shadow:0 0 0 .5px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.04);
+  /* glass */
+  --glass:rgba(255,255,255,.52); --glass-strong:rgba(255,255,255,.72); --glass-lens:rgba(255,255,255,.88);
+  --glass-edge:rgba(255,255,255,.75); --glass-edge-low:rgba(0,0,0,.06);
+  --glass-shadow:0 10px 30px rgba(15,25,55,.12),0 2px 6px rgba(15,25,55,.06);
+  --glass-blur:saturate(190%) blur(22px);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --window:#1e1e1e; --content:#262626; --sidebar:rgba(40,40,42,.78); --toolbar:rgba(38,38,40,.82);
-    --label:rgba(255,255,255,.86); --label2:rgba(255,255,255,.55); --label3:rgba(255,255,255,.28);
-    --sep:rgba(255,255,255,.10); --sep-strong:rgba(255,255,255,.16); --fill:rgba(255,255,255,.07); --fill2:rgba(255,255,255,.04);
-    --accent:#0a84ff; --sel:rgba(10,132,255,.22); --seg-on:#5b5b5f; --tip-bg:rgba(52,52,54,.94);
-    --c-op:#bf5af2; --c-reg:#0a84ff; --c-imm:#ff9f0a; --c-oth:#32d74b; --c-fix:#98989d;
-    --tint:24%; --shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 3px rgba(0,0,0,.4);
+    --bg:#121214; --wash1:rgba(10,132,255,.16); --wash2:rgba(191,90,242,.13); --wash3:rgba(48,209,88,.08);
+    --content:#1f1f22; --label:rgba(255,255,255,.88); --label2:rgba(255,255,255,.56); --label3:rgba(255,255,255,.3);
+    --sep:rgba(255,255,255,.09); --sep-strong:rgba(255,255,255,.16); --fill:rgba(255,255,255,.07); --fill2:rgba(255,255,255,.035);
+    --accent:#0a84ff; --sel:rgba(10,132,255,.24);
+    --c-op:#bf5af2; --c-reg:#0a84ff; --c-imm:#ff9f0a; --c-oth:#32d74b; --c-fix:#98989d; --tint:24%;
+    --card-shadow:0 0 0 .5px rgba(255,255,255,.07),0 2px 10px rgba(0,0,0,.35);
+    --glass:rgba(44,44,48,.46); --glass-strong:rgba(52,52,56,.66); --glass-lens:rgba(110,110,118,.55);
+    --glass-edge:rgba(255,255,255,.16); --glass-edge-low:rgba(0,0,0,.35);
+    --glass-shadow:0 12px 34px rgba(0,0,0,.45),0 2px 6px rgba(0,0,0,.3);
   }
 }
 :root[data-theme="dark"]{
-  --window:#1e1e1e; --content:#262626; --sidebar:rgba(40,40,42,.78); --toolbar:rgba(38,38,40,.82);
-  --label:rgba(255,255,255,.86); --label2:rgba(255,255,255,.55); --label3:rgba(255,255,255,.28);
-  --sep:rgba(255,255,255,.10); --sep-strong:rgba(255,255,255,.16); --fill:rgba(255,255,255,.07); --fill2:rgba(255,255,255,.04);
-  --accent:#0a84ff; --sel:rgba(10,132,255,.22); --seg-on:#5b5b5f; --tip-bg:rgba(52,52,54,.94);
-  --c-op:#bf5af2; --c-reg:#0a84ff; --c-imm:#ff9f0a; --c-oth:#32d74b; --c-fix:#98989d;
-  --tint:24%; --shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 3px rgba(0,0,0,.4);
+  --bg:#121214; --wash1:rgba(10,132,255,.16); --wash2:rgba(191,90,242,.13); --wash3:rgba(48,209,88,.08);
+  --content:#1f1f22; --label:rgba(255,255,255,.88); --label2:rgba(255,255,255,.56); --label3:rgba(255,255,255,.3);
+  --sep:rgba(255,255,255,.09); --sep-strong:rgba(255,255,255,.16); --fill:rgba(255,255,255,.07); --fill2:rgba(255,255,255,.035);
+  --accent:#0a84ff; --sel:rgba(10,132,255,.24);
+  --c-op:#bf5af2; --c-reg:#0a84ff; --c-imm:#ff9f0a; --c-oth:#32d74b; --c-fix:#98989d; --tint:24%;
+  --card-shadow:0 0 0 .5px rgba(255,255,255,.07),0 2px 10px rgba(0,0,0,.35);
+  --glass:rgba(44,44,48,.46); --glass-strong:rgba(52,52,56,.66); --glass-lens:rgba(110,110,118,.55);
+  --glass-edge:rgba(255,255,255,.16); --glass-edge-low:rgba(0,0,0,.35);
+  --glass-shadow:0 12px 34px rgba(0,0,0,.45),0 2px 6px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box}
-html{scroll-padding-top:64px}
-body{margin:0;background:var(--window);color:var(--label);font:13px/1.4 var(--font);-webkit-font-smoothing:antialiased}
+html{scroll-padding-top:66px}
+body{margin:0;color:var(--label);font:13px/1.4 var(--font);-webkit-font-smoothing:antialiased;
+  background:var(--bg);min-height:100vh}
 button,input{font:inherit;color:inherit;cursor:default}
-:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent)!important;border-radius:6px}
-code,.mono{font-family:var(--mono)}
+:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 45%,transparent)!important}
+code{font-family:var(--mono)}
 
-/* Toolbar */
-.toolbar{position:sticky;top:0;z-index:10;height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;
-  background:var(--toolbar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--sep)}
+/* ---------- Liquid Glass material (navigation / control layer only) ---------- */
+.glass{position:relative;background:var(--content);box-shadow:0 0 0 .5px var(--sep-strong)}
+
+/* ---------- Floating toolbar ---------- */
+.toolbar{position:sticky;top:0;z-index:20;margin:0;height:54px;border-radius:0;display:flex;align-items:center;gap:10px;padding:0 9px 0 20px}
 .toolbar .title{display:flex;flex-direction:column;min-width:0}
-.toolbar h1{font-size:13px;font-weight:600;margin:0;white-space:nowrap}
+.toolbar h1{font-size:13px;font-weight:650;margin:0;white-space:nowrap}
 .toolbar .subtitle{font-size:11px;color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .toolbar .subtitle a{color:var(--accent);text-decoration:none}
 .toolbar .subtitle a:hover{text-decoration:underline}
 .spacer{flex:1}
-.search{position:relative;width:220px;flex-shrink:1;min-width:120px}
-.search svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--label2);pointer-events:none}
-.search input{width:100%;height:28px;padding:0 8px 0 27px;border-radius:7px;border:none;background:var(--fill);color:var(--label);outline:none;cursor:text}
+.search{position:relative;width:230px;flex-shrink:1;min-width:120px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--label2);pointer-events:none}
+.search input{width:100%;height:30px;padding:0 10px 0 29px;border-radius:7px;border:none;background:var(--fill);color:var(--label);outline:none;cursor:text;
+  box-shadow:inset 0 0 0 .5px var(--sep)}
 .search input::placeholder{color:var(--label3)}
-.switch{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--label2);white-space:nowrap}
-.switch input{appearance:none;-webkit-appearance:none;width:26px;height:15px;border-radius:8px;background:var(--fill);position:relative;margin:0;
-  box-shadow:inset 0 0 0 .5px var(--sep-strong);transition:background .15s}
-.switch input::after{content:"";position:absolute;top:1.5px;left:1.5px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s}
+.switch{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--label2);white-space:nowrap;padding:0 6px}
+.switch input{appearance:none;-webkit-appearance:none;width:34px;height:20px;border-radius:10px;background:var(--fill);position:relative;margin:0;
+  box-shadow:inset 0 0 0 .5px var(--sep-strong);transition:background .2s}
+.switch input::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.3),inset 0 0 0 .5px rgba(0,0,0,.04);transition:transform .25s cubic-bezier(.3,1.4,.5,1)}
 .switch input:checked{background:var(--accent)}
-.switch input:checked::after{transform:translateX(11px)}
+.switch input:checked::after{transform:translateX(14px)}
+/* capsule segmented control with a glass "lens" on the selected segment */
+.seg{display:inline-flex;background:var(--fill);border-radius:8px;padding:2px;gap:2px;flex-shrink:0;box-shadow:inset 0 0 0 .5px var(--sep)}
+.seg button{border:none;background:none;height:24px;padding:0 11px;border-radius:6px;font-size:12px;font-weight:550;color:var(--label);transition:background .2s,box-shadow .2s}
+.seg button:hover{background:var(--fill2)}
+.seg button[aria-pressed="true"]{background:var(--content);box-shadow:0 0 0 .5px var(--sep-strong),0 1px 2px rgba(0,0,0,.14)}
+.btn{border:none;background:var(--content);color:var(--label);border-radius:6px;height:24px;padding:0 10px;font-size:12px;font-weight:550;
+  box-shadow:0 0 0 .5px var(--sep-strong),0 1px 1px rgba(0,0,0,.06)}
+.btn:active{transform:scale(.97)}
 
-/* Split view */
-.split{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:calc(100vh - 52px)}
-.sidebar{position:sticky;top:52px;align-self:start;height:calc(100vh - 52px);overflow:auto;padding:10px 10px 16px;
-  background:var(--sidebar);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-right:1px solid var(--sep)}
-.sidebar,.card{scrollbar-width:thin;scrollbar-color:var(--label3) transparent}
-.sb-h{font-size:11px;font-weight:600;color:var(--label2);padding:8px 8px 4px;display:flex;align-items:center}
-.sb-h .act{margin-left:auto;display:flex;gap:2px}
-.sb-h button{border:none;background:none;color:var(--accent);font-size:11px;padding:1px 5px;border-radius:4px}
-.sb-h button:hover{background:var(--fill)}
-.src{list-style:none;margin:0;padding:0}
-.src li{display:flex;align-items:center;gap:7px;height:28px;padding:0 8px;border-radius:6px}
-.src li:hover{background:var(--fill2)}
-.src li.off .nm{color:var(--label3)}
-.src input{accent-color:var(--accent);margin:0;width:14px;height:14px}
-.src .nm{flex:1;min-width:0;text-align:left;border:none;background:none;padding:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.src .badge{font-size:11px;color:var(--label2);font-variant-numeric:tabular-nums;background:var(--fill);border-radius:9px;padding:0 6px;min-width:22px;text-align:center}
-.legend{list-style:none;margin:0;padding:0 8px}
-.legend li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--label2);padding:3px 0}
+/* ---------- Split view ---------- */
+.split{display:grid;grid-template-columns:268px minmax(0,1fr);gap:0}
+.sidebar{position:sticky;top:54px;align-self:start;margin:0;height:calc(100vh - 54px);border-radius:0;display:flex;flex-direction:column;overflow:hidden}
+.sb-scroll{overflow:auto;padding:10px 8px 14px;flex:1;scrollbar-width:thin;scrollbar-color:var(--label3) transparent}
+.sb-top{display:flex;align-items:center;gap:6px;padding:12px 14px 8px;border-bottom:.5px solid var(--sep)}
+.sb-top .h{font-size:12px;font-weight:650;flex:1}
+.sb-top button{border:none;background:var(--fill);color:var(--accent);font-size:11.5px;font-weight:550;padding:3px 10px;border-radius:11px}
+.sb-top button:hover{background:var(--sel)}
+.tree{list-style:none;margin:0;padding:0}
+.tree ul{list-style:none;margin:0;padding:0 0 0 14px}
+.tree li>.r{display:flex;align-items:center;gap:6px;min-height:28px;padding:0 8px 0 4px;border-radius:9px}
+.tree li>.r:hover{background:var(--fill2)}
+.tree .sec{margin-top:6px}
+.tree .sec>.r{min-height:30px}
+.tree .sec>.r .nm{font-weight:650;font-size:12px;color:var(--label2);text-transform:none}
+.tree input[type=checkbox]{accent-color:var(--accent);margin:0;width:14px;height:14px;flex-shrink:0}
+.tree .chev{width:16px;height:16px;border:none;background:none;padding:0;display:grid;place-items:center;color:var(--label2);flex-shrink:0;border-radius:5px}
+.tree .chev svg{width:9px;height:9px;transition:transform .2s}
+.tree .open>.r .chev svg{transform:rotate(90deg)}
+.tree .chev-sp{width:16px;flex-shrink:0}
+.tree .nm{flex:1;min-width:0;text-align:left;border:none;background:none;padding:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tree .off>.r .nm{color:var(--label3)}
+.tree .meta-tag{font:600 9.5px var(--font);letter-spacing:.02em;text-transform:uppercase;color:var(--accent);background:var(--sel);border-radius:6px;padding:1px 5px;flex-shrink:0}
+.badge{font-size:11px;color:var(--label2);font-variant-numeric:tabular-nums;background:var(--fill);border-radius:9px;padding:0 7px;min-width:24px;text-align:center;flex-shrink:0}
+.tree li:not(.open)>ul{display:none}
+.legend{list-style:none;margin:10px 0 0;padding:10px 12px 0;border-top:.5px solid var(--sep)}
+.legend li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--label2);padding:2.5px 0}
 .legend i.fld{width:14px;height:14px;min-height:0;border-radius:4px;flex-shrink:0}
-.sb-note{font-size:11px;color:var(--label2);padding:10px 8px 0;line-height:1.45}
-.sb-note code{font-size:10.5px}
+.sb-note{font-size:11px;color:var(--label2);padding:8px 12px 0;line-height:1.45}
 
-/* Content */
-.content{padding:4px 24px 48px;min-width:0}
-section.grp{margin-top:22px;scroll-margin-top:64px}
-.grp-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 4px 2px}
-.grp-h h2{font-size:15px;font-weight:600;margin:0}
-.grp-h .id{font:600 11px var(--mono);color:var(--label2);background:var(--fill);padding:1px 6px;border-radius:5px}
-.grp-n{font-size:12px;color:var(--label2);margin:0 4px 8px}
-.card{background:var(--content);border-radius:10px;box-shadow:var(--shadow);overflow-x:auto}
+/* ---------- Content layer (solid, no glass) ---------- */
+.content{padding:6px 22px 48px 20px;min-width:0}
+section.grp{margin-top:22px;scroll-margin-top:84px}
+.grp-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 6px 2px}
+.grp-h h2{font-size:15px;font-weight:650;margin:0}
+.grp-h .id{font:600 11px var(--mono);color:var(--label2);background:var(--fill);padding:2px 8px;border-radius:8px}
+.grp-n{font-size:12px;color:var(--label2);margin:0 6px 8px}
+.card{background:var(--content);border-radius:10px;box-shadow:var(--card-shadow);overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--label3) transparent}
 .tbl{min-width:1000px}
 .row{display:grid;grid-template-columns:292px minmax(0,1fr);align-items:stretch;position:relative}
-.row+.row::before{content:"";position:absolute;top:0;left:12px;right:0;height:1px;background:var(--sep)}
+.row+.row::before{content:"";position:absolute;top:0;left:14px;right:0;height:1px;background:var(--sep)}
 .row:not(.ruler):hover{background:var(--fill2)}
-.row.ruler{background:var(--fill2);border-radius:10px 10px 0 0}
-.meta{padding:7px 12px;display:flex;flex-direction:column;justify-content:center;gap:1px;min-width:0}
-.l1{display:flex;gap:7px;align-items:center}
+.row.ruler{background:var(--fill2)}
+.meta{padding:7px 14px;display:flex;flex-direction:column;justify-content:center;gap:1px;min-width:0}
+.l1{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 .mn{font:600 13px var(--mono)}
-.fmt{font:500 10px var(--mono);color:var(--label2);box-shadow:inset 0 0 0 1px var(--sep-strong);border-radius:4px;padding:0 4px;line-height:15px}
+.fmt{font:500 10px var(--mono);color:var(--label2);box-shadow:inset 0 0 0 1px var(--sep-strong);border-radius:5px;padding:0 4px;line-height:15px}
 .asm{font-size:12px;color:var(--label);opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mm{font:10.5px var(--mono);color:var(--label2);font-variant-numeric:tabular-nums}
 .rh{font-size:11px;color:var(--label2)}
-.bits{display:grid;grid-template-columns:repeat(32,minmax(0,1fr));padding:5px 12px 5px 0;gap:0 2px}
-.fld{display:flex;flex-direction:column;justify-content:center;min-height:38px;min-width:0;text-align:center;overflow:hidden;border-radius:5px;
+.bits{display:grid;grid-template-columns:repeat(32,minmax(0,1fr));padding:5px 14px 5px 0;gap:0 2px}
+.fld{display:flex;flex-direction:column;justify-content:center;min-height:38px;min-width:0;text-align:center;overflow:hidden;border-radius:7px;
   background:color-mix(in srgb,var(--c) var(--tint),var(--content));box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--c) 45%,transparent)}
 .fld .v{font:600 11.5px var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
 .fld .digits{display:flex}
@@ -113,87 +145,90 @@ section.grp{margin-top:22px;scroll-margin-top:64px}
 .fld .digits span+span{box-shadow:-1px 0 0 color-mix(in srgb,var(--c) 22%,transparent)}
 .fld .c{font-size:9.5px;color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
 .k-fix{--c:var(--c-fix)} .k-op{--c:var(--c-op)} .k-reg{--c:var(--c-reg)} .k-imm{--c:var(--c-imm)} .k-oth{--c:var(--c-oth)}
+.sp16{grid-column:span 16}
 .rul{font:10px var(--mono);color:var(--label3);text-align:center;padding:6px 0;font-variant-numeric:tabular-nums}
 .rul.hl{color:var(--label2);font-weight:600}
 .empty{color:var(--label2);padding:60px 0;text-align:center;font-size:13px}
-.foot{color:var(--label2);font-size:11.5px;margin:28px 4px 0;max-width:900px;line-height:1.5}
+.foot{color:var(--label2);font-size:11.5px;margin:28px 6px 0;max-width:960px;line-height:1.55}
+.tag{font:600 10px var(--mono);color:var(--label2);background:var(--fill);border-radius:5px;padding:1px 5px;white-space:nowrap}
 
-/* Segmented control + push buttons */
-.seg{display:inline-flex;background:var(--fill);border-radius:7px;padding:2px;gap:2px;flex-shrink:0}
-.seg button{border:none;background:none;height:22px;padding:0 11px;border-radius:5px;font-size:12px;font-weight:500;color:var(--label)}
-.seg button[aria-pressed="true"]{background:var(--seg-on);box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.14)}
-.btn{border:none;background:var(--seg-on);color:var(--label);box-shadow:0 0 0 .5px var(--sep-strong),0 1px 1px rgba(0,0,0,.06);border-radius:6px;height:22px;padding:0 10px;font-size:12px}
-.btn:active{filter:brightness(.93)}
-
-/* Opcode view */
-.ophead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:20px 4px 10px;font-size:12px;color:var(--label2)}
+/* ---------- Opcode view ---------- */
+.ophead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:18px 6px 12px;font-size:12px;color:var(--label2)}
 .ophead .spacer{flex:1}
-details.op{background:var(--content);border-radius:10px;box-shadow:var(--shadow);margin-bottom:10px}
+details.op{background:var(--content);border-radius:10px;box-shadow:var(--card-shadow);margin-bottom:10px}
 details.op>summary{list-style:none;display:flex;gap:10px;padding:10px 14px;align-items:flex-start;border-radius:10px}
 details.op>summary::-webkit-details-marker{display:none}
 details.op>summary:hover{background:var(--fill2)}
 details.op[open]>summary{border-radius:10px 10px 0 0}
-.chev{width:10px;height:10px;margin-top:6px;flex-shrink:0;color:var(--label2);transition:transform .15s}
+details.op .chev{width:10px;height:10px;margin-top:6px;flex-shrink:0;color:var(--label2);transition:transform .2s}
 details.op[open]>summary .chev{transform:rotate(90deg)}
 .op-main{min-width:0;flex:1}
 .op-l1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .op-bin{font:600 14px var(--mono);letter-spacing:.02em}
 .op-dot{width:8px;height:8px;border-radius:50%;background:var(--c-op);flex-shrink:0}
-.op-name{font-weight:600}
+.op-name{font-weight:650}
 .op-hex{font:11px var(--mono);color:var(--label2)}
-.op-sub{font:600 12.5px var(--mono);background:var(--fill);border-radius:5px;padding:1px 6px}
+.op-sub{font:600 12.5px var(--mono);background:var(--fill);border-radius:8px;padding:1px 7px}
 .op-field{font-size:11px;color:var(--label3)}
 .op-exts{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
-.tag{font:600 10px var(--mono);color:var(--label2);background:var(--fill);border-radius:4px;padding:1px 5px;white-space:nowrap}
 .op-mns{margin-top:6px;display:flex;flex-wrap:wrap;gap:2px 4px;margin-left:-4px}
-.mnchip{font:12.5px var(--mono);border:none;background:none;padding:1px 4px;border-radius:4px;color:var(--accent)}
+.mnchip{font:12.5px var(--mono);border:none;background:none;padding:1px 5px;border-radius:7px;color:var(--accent)}
 .mnchip:hover{background:var(--sel)}
 .op-body{padding:2px 10px 10px}
-.op-body .card{box-shadow:0 0 0 .5px var(--sep-strong)}
+.op-body .card{box-shadow:0 0 0 .5px var(--sep-strong);border-radius:12px}
 @keyframes flash{from{background:var(--sel)}to{background:transparent}}
 .row.flash{animation:flash 1.8s ease-out}
 
-/* Instruction description popover */
-.tip{position:fixed;left:0;top:0;z-index:50;max-width:400px;padding:8px 11px 9px;border-radius:8px;background:var(--tip-bg);
-  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
-  box-shadow:0 0 0 .5px var(--sep-strong),0 8px 24px rgba(0,0,0,.18);font-size:12px;line-height:1.45;color:var(--label);
-  opacity:0;pointer-events:none;transition:opacity .12s}
+/* ---------- Tooltip (glass popover) ---------- */
+.tip{position:fixed;left:0;top:0;z-index:50;max-width:420px;padding:9px 13px 10px;border-radius:16px;font-size:12px;line-height:1.45;color:var(--label);
+  opacity:0;pointer-events:none;transition:opacity .14s;background:var(--content);box-shadow:0 0 0 .5px var(--sep-strong),0 8px 24px rgba(0,0,0,.18)}
 .tip.on{opacity:1}
-.tip-h{display:flex;gap:8px;align-items:center;margin-bottom:3px}
-.tip-h code{font-weight:600;font-size:12px}
+.tip-h{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:3px}
+.tip-h code{font-weight:650;font-size:12px}
 [data-tip].mn,[data-tip].mnchip{text-decoration:underline dotted var(--label3);text-underline-offset:3px}
 
-/* Narrow windows: sidebar becomes a horizontal source strip */
-@media (max-width:760px){
-  .toolbar{height:auto;flex-wrap:wrap;padding:8px 16px;gap:8px}
+/* ---------- Accessibility: Reduce Transparency / Increase Contrast ---------- */
+@media (prefers-reduced-transparency: reduce){
+  .glass,.tip{background:var(--content)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .glass::before{display:none}
+  body{background:var(--bg)}
+}
+@media (prefers-contrast: more){
+  .glass{box-shadow:0 0 0 1px var(--label3),var(--glass-shadow)}
+  .fld{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 70%,transparent)}
+}
+
+/* ---------- Narrow windows ---------- */
+@media (max-width:820px){
+  .toolbar{height:auto;flex-wrap:wrap;padding:8px 16px;border-radius:0;gap:8px}
   .toolbar .title{flex-basis:100%}
   .search{flex:1;width:auto}
   .split{grid-template-columns:1fr}
-  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--sep);padding:6px 8px}
-  .src{display:flex;overflow-x:auto;gap:2px;scrollbar-width:none}
-  .src::-webkit-scrollbar{display:none}
+  .sidebar{position:static;height:auto;max-height:46vh;margin:0}
+  .legend,.sb-note{display:none}
+  .content{padding:4px 12px 40px}
   .tbl{min-width:640px}
+  .tbl.t16{min-width:0}
   .row{grid-template-columns:1fr}
   .row .meta{padding:8px 12px 2px}
   .row .bits{padding:2px 12px 8px}
   .row.ruler .meta{display:none}
   .row.ruler .bits{padding-top:6px}
-  .src li{flex-shrink:0}
-  .legend,.sb-note,.sb-h.lg{display:none}
-  .content{padding:4px 16px 40px}
-  html{scroll-padding-top:110px}
+  .bits.w16{grid-template-columns:repeat(16,minmax(0,1fr))}
+  .sp16{display:none}
+  html{scroll-padding-top:150px}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<header class="toolbar">
+<header class="toolbar glass">
   <div class="title">
     <h1>RV32 Instruction Encodings</h1>
-    <div class="subtitle">Based on the <a href="https://docs.riscv.org/reference/isa/v20260120/unpriv/rv32.html" target="_blank" rel="noopener">RISC-V Unprivileged ISA v20260120</a></div>
+    <div class="subtitle">Based on the <a href="https://docs.riscv.org/reference/isa/v20260120/unpriv/rv32.html" target="_blank" rel="noopener">RISC-V ISA manuals v20260120</a></div>
   </div>
   <div class="spacer"></div>
-  <div class="seg" role="group" aria-label="View"><button data-view="ext" aria-pressed="true">Extensions</button><button data-view="op" aria-pressed="false">Opcodes</button></div>
+  <div class="seg" id="viewseg" role="group" aria-label="View"><button data-view="ext" aria-pressed="true">Extensions</button><button data-view="op" aria-pressed="false">Opcodes</button></div>
   <label class="search" aria-label="Filter instructions">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>
     <input type="search" id="q" placeholder="Search" autocomplete="off" spellcheck="false">
@@ -201,22 +236,23 @@ details.op[open]>summary .chev{transform:rotate(90deg)}
   <label class="switch"><input type="checkbox" id="showmm" role="switch">Match/Mask</label>
 </header>
 <div class="split">
-  <nav class="sidebar" aria-label="Extensions">
-    <div class="sb-h">Extensions<span class="act"><button id="all">All</button><button id="none">None</button></span></div>
-    <ul class="src" id="src"></ul>
-    <div class="sb-h lg" style="margin-top:12px">Legend</div>
-    <ul class="legend">
-      <li><i class="k-op fld"></i>opcode / op</li>
-      <li><i class="k-fix fld"></i>fixed funct / constant</li>
-      <li><i class="k-reg fld"></i>register specifier</li>
-      <li><i class="k-imm fld"></i>immediate / offset</li>
-      <li><i class="k-oth fld"></i>csr, rm, aq/rl, fence bits</li>
-    </ul>
-    <p class="sb-note"><code>imm[12|10:5]</code> lists the immediate bits held by a field, MSB first. <code>rd′</code>/<code>rs1′</code>/<code>rs2′</code> encode x8–x15 (f8–f15).</p>
+  <nav class="sidebar glass" aria-label="Extensions">
+    <div class="sb-top"><span class="h">Extensions</span><button id="all">All</button><button id="none">None</button></div>
+    <div class="sb-scroll">
+      <ul class="tree" id="tree"></ul>
+      <ul class="legend">
+        <li><i class="k-op fld"></i>opcode / op</li>
+        <li><i class="k-fix fld"></i>fixed funct / constant</li>
+        <li><i class="k-reg fld"></i>register specifier</li>
+        <li><i class="k-imm fld"></i>immediate / offset</li>
+        <li><i class="k-oth fld"></i>csr, rm, aq/rl, vm, fence bits</li>
+      </ul>
+      <p class="sb-note"><span class="meta-tag" style="font-size:9px">meta</span> marks a meta-extension: its checkbox selects all of its member extensions. A member that belongs to several meta-extensions (e.g. Zca in C and Zce) appears under each of them.</p>
+    </div>
   </nav>
   <main class="content">
     <div id="out"></div>
-    <p class="foot">Encodings checked against the RISC-V Unprivileged ISA manual (v20260120): Ch. 36 instruction listings (RV32I, Zifencei, Zicsr, M, A, F, D), RVC listing figures (C) and per-instruction encodings (Zicond, Zba/Zbb/Zbc/Zbs). The privileged groups (Priv, Smrnmi, Smctr, Svinval, H) were checked against the Vol. II Ch. 19 privileged instruction listings. F/D register fields name f-registers where the syntax says <code>fd</code>/<code>fs1</code>/…; hover over a mnemonic or its syntax for a description of the instruction, and over a field to see its bit range and value. Append <code>?ext=RV32I,M,C</code> to the URL to open with only those extensions shown, and <code>&amp;view=op</code> for the opcode view (plus <code>&amp;by=f3</code>, <code>f7</code> or <code>f37</code> to group by funct3/funct7 as well). In the opcode view, C instructions are grouped by their RVC opcode-map cell (funct3 + op); the search field also accepts an opcode such as <code>op-fp</code>, <code>0x33</code> or <code>0b0110011</code>.</p>
+    <p class="foot">Encodings checked against the RISC-V Unprivileged and Privileged ISA manuals (v20260120): the instruction-set listings, the RVC listing figures, the per-instruction encoding diagrams, and the vector instruction listing / load-store tables. Encodings of the extensions added from the <code>riscv/riscv-opcodes</code> repository were cross-checked against those manuals wherever the manual contains a textual encoding. Extensions without new instruction encodings are not listed: Zicntr/Zihpm (CSR-read pseudo-instructions), Zmmul (subset of M), Ztso, Zfinx/Zdinx/Zhinx (reuse the F/D/Zfh encodings with x registers), Zkr/Zkt, Zvkt, Zve*, and RV32E. Hover over a mnemonic or its syntax for a description, and over a field for its bit range and value. URL parameters: <code>?ext=G,B,Zce</code> (extensions or meta-extensions), <code>&amp;view=op</code>, <code>&amp;by=f3|f7|f37</code>.</p>
   </main>
 </div>
 
@@ -503,9 +539,11 @@ divu       |R|divu rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=5 6..0=0x33
 rem        |R|rem rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=6 6..0=0x33
 remu       |R|remu rd, rs1, rs2|rd rs1 rs2 31..25=1 14..12=7 6..0=0x33
 
-# A | "A" Atomic Instructions (Zalrsc + Zaamo) | Ch. 12 – aq/rl set acquire/release ordering (e.g. amoadd.w.aqrl)
+# Zalrsc | Zalrsc – Load-Reserved / Store-Conditional (A) | Ch. 12
 lr.w       |R|lr.w rd, (rs1)|rd rs1 aq rl 31..27=0x02 24..20=0 14..12=2 6..0=0x2f
 sc.w       |R|sc.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x03 14..12=2 6..0=0x2f
+
+# Zaamo | Zaamo – Atomic Memory Operations (A) | Ch. 12 – aq/rl set acquire/release ordering (e.g. amoadd.w.aqrl)
 amoswap.w  |R|amoswap.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x01 14..12=2 6..0=0x2f
 amoadd.w   |R|amoadd.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x00 14..12=2 6..0=0x2f
 amoxor.w   |R|amoxor.w rd, rs2, (rs1)|rd rs1 rs2 aq rl 31..27=0x04 14..12=2 6..0=0x2f
@@ -616,14 +654,10 @@ binvi      |I|binvi rd, rs1, shamt|rd rs1 shamt 31..25=0x34 14..12=1 6..0=0x13
 bset       |R|bset rd, rs1, rs2|rd rs1 rs2 31..25=0x14 14..12=1 6..0=0x33
 bseti      |I|bseti rd, rs1, shamt|rd rs1 shamt 31..25=0x14 14..12=1 6..0=0x13
 
-# C | "C" Compressed Instructions (RV32) | Ch. 27 – 16-bit; incl. RV32 FP loads/stores (Zcf/Zcd). rd'/rs1'/rs2' = x8–x15
+# Zca | Zca – Compressed Integer Instructions (C) | Ch. 27 – 16-bit; rd'/rs1'/rs2' = x8–x15
 c.addi4spn |CIW|c.addi4spn rd', sp, nzuimm|15..13=0 12..5:nzuimm[5:4|9:6|2|3] 4..2:rd' 1..0=0
-c.fld      |CL|c.fld fd', uimm(rs1')|15..13=1 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[7:6] 4..2:rd' 1..0=0
 c.lw       |CL|c.lw rd', uimm(rs1')|15..13=2 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[2|6] 4..2:rd' 1..0=0
-c.flw      |CL|c.flw fd', uimm(rs1')|15..13=3 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[2|6] 4..2:rd' 1..0=0
-c.fsd      |CS|c.fsd fs2', uimm(rs1')|15..13=5 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[7:6] 4..2:rs2' 1..0=0
 c.sw       |CS|c.sw rs2', uimm(rs1')|15..13=6 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[2|6] 4..2:rs2' 1..0=0
-c.fsw      |CS|c.fsw fs2', uimm(rs1')|15..13=7 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[2|6] 4..2:rs2' 1..0=0
 c.nop      |CI|c.nop|15..13=0 12=0 11..7=0 6..2=0 1..0=1
 c.addi     |CI|c.addi rd, nzimm|15..13=0 12:nzimm[5] 11..7:rd/rs1 6..2:nzimm[4:0] 1..0=1
 c.jal      |CJ|c.jal offset|15..13=1 12..2:imm[11|4|9:8|10|6|7|3:1|5] 1..0=1
@@ -641,17 +675,25 @@ c.j        |CJ|c.j offset|15..13=5 12..2:imm[11|4|9:8|10|6|7|3:1|5] 1..0=1
 c.beqz     |CB|c.beqz rs1', offset|15..13=6 12..10:imm[8|4:3] 9..7:rs1' 6..2:imm[7:6|2:1|5] 1..0=1
 c.bnez     |CB|c.bnez rs1', offset|15..13=7 12..10:imm[8|4:3] 9..7:rs1' 6..2:imm[7:6|2:1|5] 1..0=1
 c.slli     |CI|c.slli rd, shamt|15..13=0 12=0:shamt[5] 11..7:rd/rs1 6..2:shamt[4:0] 1..0=2
-c.fldsp    |CI|c.fldsp fd, uimm(sp)|15..13=1 12:uimm[5] 11..7:rd 6..2:uimm[4:3|8:6] 1..0=2
 c.lwsp     |CI|c.lwsp rd, uimm(sp)|15..13=2 12:uimm[5] 11..7:rd 6..2:uimm[4:2|7:6] 1..0=2
-c.flwsp    |CI|c.flwsp fd, uimm(sp)|15..13=3 12:uimm[5] 11..7:rd 6..2:uimm[4:2|7:6] 1..0=2
 c.jr       |CR|c.jr rs1|15..12=8 11..7:rs1 6..2=0 1..0=2
 c.mv       |CR|c.mv rd, rs2|15..12=8 11..7:rd 6..2:rs2 1..0=2
 c.ebreak   |CR|c.ebreak|15..12=9 11..7=0 6..2=0 1..0=2
 c.jalr     |CR|c.jalr rs1|15..12=9 11..7:rs1 6..2=0 1..0=2
 c.add      |CR|c.add rd, rs2|15..12=9 11..7:rd/rs1 6..2:rs2 1..0=2
-c.fsdsp    |CSS|c.fsdsp fs2, uimm(sp)|15..13=5 12..7:uimm[5:3|8:6] 6..2:rs2 1..0=2
 c.swsp     |CSS|c.swsp rs2, uimm(sp)|15..13=6 12..7:uimm[5:2|7:6] 6..2:rs2 1..0=2
+
+# Zcf | Zcf – Compressed Single-Precision Loads/Stores (C, RV32) | Ch. 27 – fd'/fs2' = f8–f15
+c.flw      |CL|c.flw fd', uimm(rs1')|15..13=3 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[2|6] 4..2:rd' 1..0=0
+c.fsw      |CS|c.fsw fs2', uimm(rs1')|15..13=7 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[2|6] 4..2:rs2' 1..0=0
+c.flwsp    |CI|c.flwsp fd, uimm(sp)|15..13=3 12:uimm[5] 11..7:rd 6..2:uimm[4:2|7:6] 1..0=2
 c.fswsp    |CSS|c.fswsp fs2, uimm(sp)|15..13=7 12..7:uimm[5:2|7:6] 6..2:rs2 1..0=2
+
+# Zcd | Zcd – Compressed Double-Precision Loads/Stores (C) | Ch. 27 – fd'/fs2' = f8–f15
+c.fld      |CL|c.fld fd', uimm(rs1')|15..13=1 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[7:6] 4..2:rd' 1..0=0
+c.fsd      |CS|c.fsd fs2', uimm(rs1')|15..13=5 12..10:uimm[5:3] 9..7:rs1' 6..5:uimm[7:6] 4..2:rs2' 1..0=0
+c.fldsp    |CI|c.fldsp fd, uimm(sp)|15..13=1 12:uimm[5] 11..7:rd 6..2:uimm[4:3|8:6] 1..0=2
+c.fsdsp    |CSS|c.fsdsp fs2, uimm(sp)|15..13=5 12..7:uimm[5:3|8:6] 6..2:rs2 1..0=2
 
 # Priv | Trap Return, Interrupt and Memory Management | Privileged ISA (Vol. II) Ch. 19 listings
 mret       |I|mret|31..20=0x302 19..15=0 14..12=0 11..7=0 6..0=0x73
@@ -690,29 +732,42 @@ hsv.w       |R|hsv.w rs2, (rs1)|rs1 rs2 31..25=0x35 14..12=4 11..7=0 6..0=0x73
 <script>
 (function(){
 "use strict";
-const ARGS = {
+// ---------- Sidebar tree: meta-extensions (meta:true) and categories ----------
+const TREE=[
+  {id:"G",meta:true,title:"G – general-purpose ISA (IMAFD, Zicsr, Zifencei)",children:["RV32I","M",{id:"A",meta:true,title:"A = Zalrsc + Zaamo",children:["Zalrsc","Zaamo"]},"F","D","Zicsr","Zifencei"]},
+  {id:"Zi",title:"Other Zi* extensions",children:["Zihintpause","Zihintntl","Zimop","Zicond",{id:"CMO",title:"Cache-block operations",children:["Zicbom","Zicboz","Zicbop"]},{id:"CFI",title:"Control-flow integrity",children:["Zicfilp","Zicfiss"]},"Zilsd"]},
+  {id:"Za",title:"Additional atomics",children:["Zawrs","Zacas","Zabha","Zalasr"]},
+  {id:"FP",title:"More floating point",children:["Q",{id:"Zfh",meta:true,title:"Zfh = Zfhmin + half-precision arithmetic",children:["Zfhmin","Zfh"]},"Zfbfmin","Zfa"]},
+  {id:"Comp",title:"Compressed",children:[{id:"C",meta:true,title:"C = Zca + Zcf + Zcd (RV32 with F/D)",children:["Zca","Zcf","Zcd"]},{id:"Zce",meta:true,title:"Zce = Zca + Zcb + Zcmp + Zcmt + Zcf (RV32)",children:["Zca","Zcb","Zcmp","Zcmt","Zcf"]},"Zcmop","Zclsd"]},
+  {id:"Bit",title:"Bit manipulation",children:[{id:"B",meta:true,title:"B = Zba + Zbb + Zbs",children:["Zba","Zbb","Zbs"]},"Zbc"]},
+  {id:"Crypto",title:"Scalar cryptography",children:[{id:"Zkn",meta:true,title:"Zkn – NIST suite (Zk = Zkn + Zkr + Zkt)",children:["Zbkb","Zbkc","Zbkx","Zkne","Zknd","Zknh"]},{id:"Zks",meta:true,title:"Zks – ShangMi suite",children:["Zbkb","Zbkc","Zbkx","Zksed","Zksh"]}]},
+  {id:"Vec",title:"Vector",children:["V","Zvfbfmin","Zvfbfwma",{id:"Zvbb",meta:true,title:"Zvbb = Zvkb + basic bit-manipulation",children:["Zvkb","Zvbb"]},"Zvbc","Zvkg",{id:"Zvkn",meta:true,title:"Zvkn – NIST suite (Zvkned, Zvknhb, Zvkb, Zvkt)",children:["Zvkned","Zvknh","Zvkb"]},{id:"Zvks",meta:true,title:"Zvks – ShangMi suite (Zvksed, Zvksh, Zvkb, Zvkt)",children:["Zvksed","Zvksh","Zvkb"]}]},
+  {id:"Priv",title:"Privileged",children:["Priv","Smrnmi","Smctr","Svinval","H"]},
+];
+const LEAFLABEL={Zfh:"Zfh ∖ Zfhmin",Zvbb:"Zvbb ∖ Zvkb",Zvknh:"Zvknha/b"};
+
+// ---------- Field definitions ----------
+const ARGS={
   rd:[[11,7,"rd","reg"]], rs1:[[19,15,"rs1","reg"]], rs2:[[24,20,"rs2","reg"]], rs3:[[31,27,"rs3","reg"]],
   imm12:[[31,20,"imm[11:0]","imm"]], imm20:[[31,12,"imm[31:12]","imm"]],
   jimm20:[[31,31,"imm[20]","imm"],[30,21,"imm[10:1]","imm"],[20,20,"imm[11]","imm"],[19,12,"imm[19:12]","imm"]],
-  bimm12hi:[[31,31,"imm[12]","imm"],[30,25,"imm[10:5]","imm"]],
-  bimm12lo:[[11,8,"imm[4:1]","imm"],[7,7,"imm[11]","imm"]],
+  bimm12hi:[[31,31,"imm[12]","imm"],[30,25,"imm[10:5]","imm"]], bimm12lo:[[11,8,"imm[4:1]","imm"],[7,7,"imm[11]","imm"]],
   imm12hi:[[31,25,"imm[11:5]","imm"]], imm12lo:[[11,7,"imm[4:0]","imm"]],
   shamt:[[24,20,"shamt","imm"]], uimm:[[19,15,"uimm[4:0]","imm"]],
   csr:[[31,20,"csr","oth"]], rm:[[14,12,"rm","oth"]], aq:[[26,26,"aq","oth"]], rl:[[25,25,"rl","oth"]],
   fm:[[31,28,"fm","oth"]], pred:[[27,24,"pred","oth"]], succ:[[23,20,"succ","oth"]],
 };
-const CAP32 = {"6..0":"opcode","14..12":"funct3","31..25":"funct7","31..27":"funct5","26..25":"fmt",
+const CAP32={"6..0":"opcode","14..12":"funct3","31..25":"funct7","31..27":"funct5","31..26":"funct6","26..25":"fmt",
   "24..20":"rs2","19..15":"rs1","11..7":"rd","31..20":"funct12","31..28":"fm","27..24":"pred","23..20":"succ"};
-const CAP16 = {"1..0":"op","15..13":"funct3","15..12":"funct4","15..10":"funct6","11..10":"funct2","6..5":"funct2",
+const CAP16={"1..0":"op","15..13":"funct3","15..12":"funct4","15..10":"funct6","11..10":"funct2","6..5":"funct2",
   "11..7":"rd/rs1","6..2":"rs2","12":"funct1"};
-
 const num=s=>(s=s.trim()).startsWith("0b")?parseInt(s.slice(2),2):Number(s);
-const kindOf=l=>/^(rd|rs)/.test(l)?"reg":/imm|off|shamt/.test(l)?"imm":"oth";
+const kindOf=l=>/^(rd|rs|vd|vs|r[12]s)/.test(l)?"reg":/imm|off|shamt|index/.test(l)?"imm":"oth";
 function parseSpec(spec){
   const fields=[];
   for(const tok of spec.trim().split(/\s+/)){
     if(ARGS[tok]){ for(const f of ARGS[tok]) fields.push({hi:f[0],lo:f[1],label:f[2],kind:f[3]}); continue; }
-    const m=tok.match(/^(\d+)(?:\.\.(\d+))?(?:=([0-9a-fx]+))?(?::(.+))?$/i);
+    const m=tok.match(/^(\d+)(?:\.\.(\d+))?(?:=([0-9a-fx]+))?(?::(.*))?$/i);
     if(!m) throw new Error("bad token "+tok);
     const hi=+m[1], lo=m[2]!==undefined?+m[2]:hi;
     if(m[3]!==undefined) fields.push({hi,lo,value:num(m[3]),cap:m[4]});
@@ -721,12 +776,17 @@ function parseSpec(spec){
   return fields.sort((a,b)=>b.hi-a.hi);
 }
 
-const groups=[]; let cur=null;
+// ---------- Data ----------
+const DESC={};
+for(const raw of document.getElementById("desc").textContent.split("\n")){
+  const m=raw.match(/^([^|]+)\|(.*)$/); if(m) DESC[m[1].trim()]=m[2].trim();
+}
+const groups=[], GBY={}; let cur=null;
 for(const raw of document.getElementById("isa").textContent.split("\n")){
   const line=raw.trim(); if(!line) continue;
   if(line.startsWith("#")){
     const [id,title,note]=line.slice(1).split("|").map(s=>s.trim());
-    cur={id,title,note,insns:[]}; groups.push(cur); continue;
+    cur={id,title,note,insns:[]}; groups.push(cur); GBY[id]=cur; continue;
   }
   const [,mn,fmt,asm,spec]=line.match(/^([^|]*)\|([^|]*)\|([^|]*)\|(.*)$/).map(s=>s.trim());
   const fields=parseSpec(spec), width=fields[0].hi+1;
@@ -734,31 +794,48 @@ for(const raw of document.getElementById("isa").textContent.split("\n")){
   for(const f of fields) if(f.value!==undefined){
     mask+=((2**(f.hi-f.lo+1))-1)*(2**f.lo); match+=f.value*(2**f.lo);
     const key=f.hi===f.lo?String(f.hi):f.hi+".."+f.lo;
-    if(!f.cap) f.cap=(width===32?CAP32:CAP16)[key]||"";
-    f.kind=(f.cap==="opcode"||f.cap==="op")?"op":"fix";
+    if(f.cap===undefined) f.cap=(width===32?CAP32:CAP16)[key]||"";
+    f.kind=(key==="6..0"&&width===32)||(key==="1..0"&&width===16)?"op":"fix";
   }
-  cur.insns.push({mn,fmt,asm,fields,width,match,mask,ext:cur.id});
+  cur.insns.push({mn,fmt,asm,fields,width,match,mask,ext:cur.id,key:cur.id+":"+mn});
 }
+const BYKEY={}; groups.forEach(g=>g.insns.forEach(i=>{BYKEY[i.key]=i;}));
+// all extensions an encoding appears in (e.g. rol: Zbb + Zbkb)
+const EXTS_OF={}; groups.forEach(g=>g.insns.forEach(i=>{ const k=i.mn+"@"+i.match; (EXTS_OF[k]=EXTS_OF[k]||[]).includes(g.id)||EXTS_OF[k].push(g.id); }));
 
-// ---------- UI ----------
-const LS="rv32enc.v2";
-const state={hidden:{},q:"",mm:true,view:"ext",open:{},by:"op"};
+// tree helpers
+function leavesOf(n){ if(typeof n==="string") return [n]; return [...new Set(n.children.flatMap(leavesOf))]; }
+const NODES={}; (function walk(list){ for(const n of list) if(typeof n!=="string"){ NODES[n.id]=n; walk(n.children); } })(TREE);
+const LEAF_ORDER=[...new Set(TREE.flatMap(leavesOf))];
+for(const g of groups) if(!LEAF_ORDER.includes(g.id)) LEAF_ORDER.push(g.id);
+
+// ---------- State ----------
+const LS="rv32enc.v3";
+const state={hidden:{},q:"",mm:true,view:"ext",open:{},by:"op",exp:{}};
 try{ Object.assign(state, JSON.parse(localStorage.getItem(LS)||"{}")); }catch(e){}
-// ?ext=RV32I,M preselects extensions (case-insensitive), e.g. for sharing a link.
-const want=new URLSearchParams(location.search).get("ext");
-const wantView=new URLSearchParams(location.search).get("view"), wantBy=new URLSearchParams(location.search).get("by");
-if(wantBy&&["op","f3","f7","f37"].includes(wantBy)) state.by=wantBy;
-if(wantView==="op"||wantView==="ext") state.view=wantView;
-if(want){ const set=new Set(want.toLowerCase().split(",").map(x=>x.trim())); state.hidden={}; groups.forEach(g=>{ if(!set.has(g.id.toLowerCase())) state.hidden[g.id]=true; }); }
+const P=new URLSearchParams(location.search);
+if(["op","ext"].includes(P.get("view"))) state.view=P.get("view");
+if(["op","f3","f7","f37"].includes(P.get("by"))) state.by=P.get("by");
+if(P.get("ext")){
+  const want=new Set();
+  for(const x of P.get("ext").split(",").map(s=>s.trim().toLowerCase())){
+    const node=Object.values(NODES).find(n=>n.id.toLowerCase()===x);
+    if(node) leavesOf(node).forEach(l=>want.add(l));
+    else { const g=groups.find(g=>g.id.toLowerCase()===x); if(g) want.add(g.id); }
+  }
+  state.hidden={}; groups.forEach(g=>{ if(!want.has(g.id)) state.hidden[g.id]=true; });
+}
 const save=()=>{ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} };
 const hex=(v,w)=>"0x"+(v>>>0).toString(16).padStart(w/4,"0");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const slug=id=>"ext-"+id.toLowerCase().replace(/[^a-z0-9]+/g,"-");
+const rid=(scope,mn)=>"row-"+scope+"-"+mn.replace(/[^a-z0-9.]+/gi,"_");
 
+// ---------- Rendering helpers ----------
 function ruler(w){
   const marks=w===32?[31,25,24,20,19,15,14,12,11,7,6,0]:[15,13,12,10,9,7,6,5,4,2,1,0];
-  let h='<div class="row ruler"><div class="meta rh">'+(w===32?"32-bit instruction":"16-bit compressed instruction")+'</div><div class="bits">';
-  if(w===16) h+='<div style="grid-column:span 16"></div>';
+  let h='<div class="row ruler"><div class="meta rh">'+(w===32?"32-bit instruction":"16-bit compressed instruction")+'</div><div class="bits w'+w+'">';
+  if(w===16) h+='<div class="sp16"></div>';
   for(let b=w-1;b>=0;b--) h+='<div class="rul'+(marks.includes(b)?" hl":"")+'">'+b+'</div>';
   return h+'</div></div>';
 }
@@ -768,21 +845,35 @@ function fieldHtml(f){
     const bits=f.value.toString(2).padStart(n,"0");
     const t=(f.cap?f.cap+" ":"")+"bits "+rng+" = "+bits+"b (0x"+f.value.toString(16)+")";
     return '<div class="fld k-'+f.kind+'" style="grid-column:span '+n+'" title="'+esc(t)+'"><div class="digits">'+
-      [...bits].map(d=>"<span>"+d+"</span>").join("")+'</div><div class="c">'+esc(f.cap&&f.cap.length<=n*3+1?f.cap:"\u00a0")+'</div></div>';
+      [...bits].map(d=>"<span>"+d+"</span>").join("")+'</div><div class="c">'+esc(f.cap&&f.cap.length<=(n===1?2:n*3+1)?f.cap:"\u00a0")+'</div></div>';
   }
-  // Narrow fields: show the bracket contents (e.g. "20") with the prefix ("imm") as caption.
   let v=f.label, c=rng; const m=f.label.match(/^([^\[]+)\[(.+)\]$/);
-  if(m && f.label.length>n*3+1){ v=m[2]; c=m[1].length<=n*2?m[1]:"\u00a0"; }
+  if(m && f.label.length>n*3+1){ v=m[2]; c=m[1].length<=n*2?m[1]:" "; }
   return '<div class="fld k-'+f.kind+'" style="grid-column:span '+n+'" title="'+esc(f.label+" — bits "+rng)+'"><div class="v">'+esc(v)+
     '</div><div class="c">'+esc(c)+'</div></div>';
 }
+function rowHtml(i,scope,exts){
+  return '<div class="row" id="'+rid(scope,i.mn)+'"><div class="meta"><div class="l1"><span class="mn" data-tip="'+esc(i.key)+'">'+esc(i.mn)+'</span><span class="fmt">'+esc(i.fmt)+'</span>'+
+    (exts?exts.map(x=>'<span class="tag">'+esc(x)+'</span>').join(""):"")+'</div>'+
+    '<code class="asm" data-tip="'+esc(i.key)+'">'+esc(i.asm)+'</code>'+
+    (state.mm?'<span class="mm">match '+hex(i.match,i.width)+' · mask '+hex(i.mask,i.width)+'</span>':"")+
+    '</div><div class="bits w'+i.width+'">'+(i.width===16?'<div class="sp16"></div>':"")+i.fields.map(fieldHtml).join("")+'</div></div>';
+}
+function tables(ins,scope,withExt){
+  // split by width so 16- and 32-bit rows get their own ruler
+  let h="";
+  for(const w of [32,16]){
+    const part=ins.filter(i=>i.width===w); if(!part.length) continue;
+    h+='<div class="card"'+(h?' style="margin-top:10px"':'')+'><div class="tbl t'+w+'">'+ruler(w)+part.map(i=>rowHtml(i,scope,withExt?EXTS_OF[i.mn+"@"+i.match]:null)).join("")+'</div></div>';
+  }
+  return h;
+}
+const CHEV='<svg class="chev" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5 7 5l-3.5 3.5"/></svg>';
 const OPN={0x03:"LOAD",0x07:"LOAD-FP",0x0f:"MISC-MEM",0x13:"OP-IMM",0x17:"AUIPC",0x23:"STORE",0x27:"STORE-FP",0x2f:"AMO",
-  0x33:"OP",0x37:"LUI",0x43:"MADD",0x47:"MSUB",0x4b:"NMSUB",0x4f:"NMADD",0x53:"OP-FP",0x63:"BRANCH",0x67:"JALR",0x6f:"JAL",0x73:"SYSTEM"};
-// RVC opcode map (Table "RVC opcode map instructions"), indexed [op][funct3], RV32 column
-const CMAP=[["ADDI4SPN","FLD","LW","FLW","Reserved","FSD","SW","FSW"],
-            ["ADDI","JAL","LI","LUI/ADDI16SP","MISC-ALU","J","BEQZ","BNEZ"],
-            ["SLLI","FLDSP","LWSP","FLWSP","J[AL]R/MV/ADD","FSDSP","SWSP","FSWSP"]];
-// Value of bits hi..lo if they are all fixed for this instruction, else null.
+  0x33:"OP",0x37:"LUI",0x43:"MADD",0x47:"MSUB",0x4b:"NMSUB",0x4f:"NMADD",0x53:"OP-FP",0x57:"OP-V",0x63:"BRANCH",0x67:"JALR",0x6f:"JAL",0x73:"SYSTEM",0x77:"OP-VE"};
+const CMAP=[["ADDI4SPN","FLD","LW","FLW/LD","Zcb","FSD","SW","FSW/SD"],
+            ["ADDI","JAL","LI","LUI/ADDI16SP/MOP","MISC-ALU","J","BEQZ","BNEZ"],
+            ["SLLI","FLDSP","LWSP","FLWSP/LDSP","J[AL]R/MV/ADD","FSDSP/Zcmp/Zcmt","SWSP","FSWSP/SDSP"]];
 function bitsOf(i,hi,lo){ const m=(1<<(hi-lo+1))-1; return ((i.mask>>>lo)&m)===m?((i.match>>>lo)&m):null; }
 const BY={op:"Opcode",f3:"+ funct3",f7:"+ funct7",f37:"+ funct3 + funct7"};
 function opInfo(i){
@@ -796,44 +887,36 @@ function opInfo(i){
     return {key, sort, bin:"0b"+v.toString(2).padStart(7,"0"), hex:"0x"+v.toString(16).padStart(2,"0"), name:OPN[v]||"", sub:sub.join(" · "), field:fld.join(" · ")};
   }
   const q=i.match&3, f=(i.match>>>13)&7;
-  return {key:"c"+q+"_"+f, sort:256+q*8+f, bin:"0b"+q.toString(2).padStart(2,"0"),
-    hex:"C"+q, name:"C."+CMAP[q][f], sub:"funct3 0b"+f.toString(2).padStart(3,"0"), field:"op [1:0] · funct3 [15:13]"};
+  return {key:"c"+q+"_"+f, sort:2e9+q*8+f, bin:"0b"+q.toString(2).padStart(2,"0"), hex:"C"+q, name:"C."+CMAP[q][f],
+    sub:"funct3 0b"+f.toString(2).padStart(3,"0"), field:"op [1:0] · funct3 [15:13]"};
 }
 function matches(i,q){
   if(!q) return true;
-  if(i.mn.includes(q)||i.asm.toLowerCase().includes(q)) return true;
-  const o=opInfo(i); // also allow searching by opcode: "op-fp", "0b0110011", "0x33"
+  if(i.mn.toLowerCase().includes(q)||i.asm.toLowerCase().includes(q)) return true;
+  const o=opInfo(i);
   return o.name.toLowerCase()===q||o.bin===q||o.hex===q;
 }
-function rowHtml(i,showExt){
-  return '<div class="row" id="row-'+esc(i.mn)+'"><div class="meta"><div class="l1"><span class="mn" data-tip="'+esc(i.mn)+'">'+esc(i.mn)+'</span><span class="fmt">'+esc(i.fmt)+'</span>'+
-    (showExt?'<span class="tag">'+esc(i.ext)+'</span>':"")+'</div>'+
-    '<code class="asm" data-tip="'+esc(i.mn)+'">'+esc(i.asm)+'</code>'+
-    (state.mm?'<span class="mm">match '+hex(i.match,i.width)+' · mask '+hex(i.mask,i.width)+'</span>':"")+
-    '</div><div class="bits">'+(i.width===16?'<div style="grid-column:span 16"></div>':"")+i.fields.map(fieldHtml).join("")+'</div></div>';
-}
-function table(ins,showExt){ return '<div class="card"><div class="tbl">'+ruler(ins[0].width)+ins.map(i=>rowHtml(i,showExt)).join("")+'</div></div>'; }
-const CHEV='<svg class="chev" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5 7 5l-3.5 3.5"/></svg>';
+function visibleGroups(){ return LEAF_ORDER.map(id=>GBY[id]).filter(g=>g&&!state.hidden[g.id]); }
+
 function renderExt(q){
   let html="";
-  for(const g of groups){
-    if(state.hidden[g.id]) continue;
-    const ins=g.insns.filter(i=>matches(i,q));
-    if(!ins.length) continue;
+  for(const g of visibleGroups()){
+    const ins=g.insns.filter(i=>matches(i,q)); if(!ins.length) continue;
     html+='<section class="grp" id="'+slug(g.id)+'"><div class="grp-h"><span class="id">'+esc(g.id)+'</span><h2>'+esc(g.title)+'</h2></div>'+
-      (g.note?'<p class="grp-n">'+esc(g.note)+'</p>':"")+table(ins,false)+'</section>';
+      (g.note?'<p class="grp-n">'+esc(g.note)+'</p>':"")+tables(ins,slug(g.id),false)+'</section>';
   }
   return html;
 }
 function renderOps(q){
-  const map=new Map(); let total=0;
-  for(const g of groups){
-    if(state.hidden[g.id]) continue;
+  const map=new Map(); const seen=new Set(); let total=0;
+  for(const g of visibleGroups()){
     for(const i of g.insns){
       if(!matches(i,q)) continue;
-      const o=opInfo(i); total++;
+      const dk=i.mn+"@"+i.match; if(seen.has(dk)) continue; seen.add(dk); total++;
+      const o=opInfo(i);
       if(!map.has(o.key)) map.set(o.key,Object.assign(o,{ins:[],exts:[]}));
-      const e=map.get(o.key); e.ins.push(i); if(!e.exts.includes(i.ext)) e.exts.push(i.ext);
+      const e=map.get(o.key); e.ins.push(i);
+      for(const x of EXTS_OF[dk]) if(!state.hidden[x]&&!e.exts.includes(x)) e.exts.push(x);
     }
   }
   const ops=[...map.values()].sort((a,b)=>a.sort-b.sort);
@@ -844,95 +927,122 @@ function renderOps(q){
     '<span class="spacer"></span><button class="btn" data-act="expand">Expand All</button><button class="btn" data-act="collapse">Collapse All</button></div>';
   for(const o of ops){
     html+='<details class="op" data-key="'+o.key+'"'+(state.open[o.key]?" open":"")+'><summary>'+CHEV+'<div class="op-main"><div class="op-l1">'+
-      '<span class="op-dot"></span><code class="op-bin">'+esc(o.bin)+'</code><span class="op-name">'+esc(o.name)+'</span><span class="op-hex">'+esc(o.hex)+'</span>'+(o.sub?'<code class="op-sub">'+esc(o.sub)+'</code>':"")+
-      '<span class="badge">'+o.ins.length+'</span><span class="op-field">'+esc(o.field)+'</span>'+
+      '<span class="op-dot"></span><code class="op-bin">'+esc(o.bin)+'</code><span class="op-name">'+esc(o.name)+'</span><span class="op-hex">'+esc(o.hex)+'</span>'+
+      (o.sub?'<code class="op-sub">'+esc(o.sub)+'</code>':"")+'<span class="badge">'+o.ins.length+'</span><span class="op-field">'+esc(o.field)+'</span>'+
       '<span class="op-exts">'+o.exts.map(x=>'<span class="tag">'+esc(x)+'</span>').join("")+'</span></div>'+
-      '<div class="op-mns">'+o.ins.map(i=>'<button class="mnchip" data-mn="'+esc(i.mn)+'" data-tip="'+esc(i.mn)+'">'+esc(i.mn)+'</button>').join("")+'</div>'+
-      '</div></summary><div class="op-body">'+table(o.ins,true)+'</div></details>';
+      '<div class="op-mns">'+o.ins.map(i=>'<button class="mnchip" data-mn="'+esc(i.mn)+'" data-tip="'+esc(i.key)+'">'+esc(i.mn)+'</button>').join("")+'</div>'+
+      '</div></summary><div class="op-body">'+(state.open[o.key]?tables(o.ins,"op",true):"")+'</div></details>';
   }
   return html;
 }
 function render(){
-  document.querySelectorAll(".toolbar .seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===state.view)));
+  document.querySelectorAll("#viewseg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===state.view)));
   const q=state.q.trim().toLowerCase();
   const html=state.view==="op"?renderOps(q):renderExt(q);
   document.getElementById("out").innerHTML=html||'<p class="empty">No instructions match.</p>';
 }
-function renderSidebar(){
-  document.getElementById("src").innerHTML=groups.map(g=>{
-    const on=!state.hidden[g.id];
-    return '<li class="'+(on?"":"off")+'" title="'+esc(g.title)+'"><input type="checkbox" data-id="'+esc(g.id)+'" aria-label="Show '+esc(g.id)+'"'+(on?" checked":"")+'>'+
-      '<button class="nm" data-jump="'+esc(g.id)+'">'+esc(g.id)+'</button><span class="badge">'+g.insns.length+'</span></li>';
-  }).join("");
+
+// ---------- Sidebar tree ----------
+function countOf(leaves){ const s=new Set(); leaves.forEach(id=>GBY[id]&&GBY[id].insns.forEach(i=>s.add(i.mn+"@"+i.match))); return s.size; }
+function nodeHtml(n,path,depth){
+  if(typeof n==="string"){
+    const g=GBY[n]; if(!g) return "";
+    const on=!state.hidden[n];
+    return '<li class="leaf'+(on?"":" off")+'" title="'+esc(g.title)+'"><div class="r"><span class="chev-sp"></span><input type="checkbox" data-leaf="'+esc(n)+'"'+(on?" checked":"")+' aria-label="Show '+esc(n)+'">'+
+      '<button class="nm" data-jump="'+esc(n)+'">'+esc(LEAFLABEL[n]||n)+'</button><span class="badge">'+g.insns.length+'</span></div></li>';
+  }
+  const p=path+"/"+n.id, leaves=leavesOf(n).filter(l=>GBY[l]), vis=leaves.filter(l=>!state.hidden[l]).length;
+  if(!leaves.length) return "";
+  const open=state.exp[p]!==undefined?state.exp[p]:depth===0;
+  return '<li class="node'+(depth===0?" sec":"")+(open?" open":"")+(vis?"":" off")+'" title="'+esc(n.title)+'"><div class="r">'+
+    '<button class="chev" data-exp="'+esc(p)+'" aria-label="Expand '+esc(n.id)+'" aria-expanded="'+open+'"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 1.5 7 5l-3.5 3.5"/></svg></button>'+
+    '<input type="checkbox" data-node="'+esc(n.id)+'" data-state="'+(vis===leaves.length?"all":vis?"some":"none")+'"'+(vis===leaves.length?" checked":"")+' aria-label="Show all of '+esc(n.id)+'">'+
+    '<button class="nm" data-exp="'+esc(p)+'">'+esc(depth===0&&!n.meta?n.title:n.id)+'</button>'+(n.meta?'<span class="meta-tag">meta</span>':"")+
+    '<span class="badge">'+countOf(leaves)+'</span></div><ul>'+n.children.map(c=>nodeHtml(c,p,depth+1)).join("")+'</ul></li>';
 }
-const src=document.getElementById("src");
-src.addEventListener("change",e=>{
-  const id=e.target.dataset.id; if(!id) return;
-  state.hidden[id]=!e.target.checked; e.target.closest("li").classList.toggle("off",!e.target.checked); save(); render();
+function renderTree(){
+  const t=document.getElementById("tree");
+  t.innerHTML=TREE.map(n=>nodeHtml(n,"",0)).join("");
+  t.querySelectorAll('input[data-state="some"]').forEach(c=>{ c.indeterminate=true; });
+}
+const tree=document.getElementById("tree");
+tree.addEventListener("change",e=>{
+  const c=e.target;
+  if(c.dataset.leaf){ state.hidden[c.dataset.leaf]=!c.checked; }
+  else if(c.dataset.node){
+    const ls=leavesOf(NODES[c.dataset.node]); const show=c.dataset.state!=="all";
+    ls.forEach(l=>{ state.hidden[l]=!show; });
+  } else return;
+  save(); renderTree(); render();
 });
-src.addEventListener("click",e=>{
-  const b=e.target.closest("[data-jump]"); if(!b) return;
-  const id=b.dataset.jump;
-  if(state.hidden[id]){ state.hidden[id]=false; renderSidebar(); }
-  if(state.hidden[id]===false||state.view!=="ext"){ state.view="ext"; save(); render(); }
+tree.addEventListener("click",e=>{
+  const x=e.target.closest("[data-exp]");
+  if(x){ const p=x.dataset.exp, li=x.closest("li"), open=!li.classList.contains("open");
+    state.exp[p]=open; li.classList.toggle("open",open); li.querySelector(".chev").setAttribute("aria-expanded",open); save(); return; }
+  const j=e.target.closest("[data-jump]"); if(!j) return;
+  const id=j.dataset.jump; let changed=false;
+  if(state.hidden[id]){ state.hidden[id]=false; changed=true; }
+  if(state.view!=="ext"){ state.view="ext"; changed=true; }
+  if(changed){ save(); renderTree(); render(); }
   const el=document.getElementById(slug(id));
   if(el) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
 });
-document.getElementById("all").onclick=()=>{state.hidden={};save();renderSidebar();render();};
-document.getElementById("none").onclick=()=>{groups.forEach(g=>state.hidden[g.id]=true);save();renderSidebar();render();};
-document.querySelector(".toolbar .seg").addEventListener("click",e=>{
+document.getElementById("all").onclick=()=>{state.hidden={};save();renderTree();render();};
+document.getElementById("none").onclick=()=>{groups.forEach(g=>state.hidden[g.id]=true);save();renderTree();render();};
+
+// ---------- Toolbar / content events ----------
+document.getElementById("viewseg").addEventListener("click",e=>{
   const b=e.target.closest("[data-view]"); if(!b||b.dataset.view===state.view) return;
   state.view=b.dataset.view; save(); render(); window.scrollTo(0,0);
 });
 const out=document.getElementById("out");
 out.addEventListener("toggle",e=>{
   const d=e.target; if(!(d instanceof HTMLDetailsElement)||!d.dataset.key) return;
-  if(d.open) state.open[d.dataset.key]=true; else delete state.open[d.dataset.key];
+  if(d.open){ state.open[d.dataset.key]=true; const body=d.querySelector(".op-body"); if(!body.firstChild) fillOp(d); }
+  else delete state.open[d.dataset.key];
   save();
 },true);
+function fillOp(d){ // lazily render the rows of an opcode group when it is opened
+  const q=state.q.trim().toLowerCase(), seen=new Set(), ins=[];
+  for(const g of visibleGroups()) for(const i of g.insns){
+    const dk=i.mn+"@"+i.match; if(seen.has(dk)||!matches(i,q)) continue; seen.add(dk);
+    if(opInfo(i).key===d.dataset.key) ins.push(i);
+  }
+  d.querySelector(".op-body").innerHTML=tables(ins,"op",true);
+}
 out.addEventListener("click",e=>{
   const by=e.target.closest("[data-by]");
   if(by){ state.by=by.dataset.by; state.open={}; save(); render(); return; }
   const act=e.target.closest("[data-act]");
-  if(act){
-    const open=act.dataset.act==="expand";
-    out.querySelectorAll("details.op").forEach(d=>{ d.open=open; });
-    return;
-  }
+  if(act){ const open=act.dataset.act==="expand"; out.querySelectorAll("details.op").forEach(d=>{ if(open&&!d.querySelector(".op-body").firstChild) fillOp(d); d.open=open; }); return; }
   const chip=e.target.closest(".mnchip"); if(!chip) return;
-  e.preventDefault(); // keep the summary from toggling; open it and jump to the row instead
-  const d=chip.closest("details"); d.open=true;
-  const row=document.getElementById("row-"+chip.dataset.mn); if(!row) return;
+  e.preventDefault();
+  const d=chip.closest("details"); if(!d.querySelector(".op-body").firstChild) fillOp(d); d.open=true;
+  const row=document.getElementById(rid("op",chip.dataset.mn)); if(!row) return;
   row.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
   row.classList.remove("flash"); void row.offsetWidth; row.classList.add("flash");
 });
-const qi=document.getElementById("q"); qi.value=state.q;
-qi.addEventListener("input",()=>{state.q=qi.value;save();render();});
-qi.addEventListener("keydown",e=>{ if(e.key==="Escape"){ qi.value="";state.q="";save();render(); } });
+const qi=document.getElementById("q"); qi.value=state.q; let qt=null;
+qi.addEventListener("input",()=>{ clearTimeout(qt); qt=setTimeout(()=>{ state.q=qi.value; save(); render(); },120); });
+qi.addEventListener("keydown",e=>{ if(e.key==="Escape"){ qi.value=""; state.q=""; save(); render(); } });
 const mm=document.getElementById("showmm"); mm.checked=state.mm;
-mm.addEventListener("change",()=>{state.mm=mm.checked;save();render();});
-// ---------- Description tooltips ----------
-const DESC={};
-for(const raw of document.getElementById("desc").textContent.split("\n")){
-  const m=raw.match(/^([^|]+)\|(.*)$/); if(m) DESC[m[1].trim()]=m[2].trim();
-}
-const BYMN={}; groups.forEach(g=>g.insns.forEach(i=>{ BYMN[i.mn]=i; }));
-const tip=document.createElement("div"); tip.className="tip"; tip.id="tip"; tip.setAttribute("role","tooltip");
+mm.addEventListener("change",()=>{ state.mm=mm.checked; save(); render(); });
+
+// ---------- Description tooltips (glass popover) ----------
+const tip=document.createElement("div"); tip.className="tip glass"; tip.id="tip"; tip.setAttribute("role","tooltip");
 document.body.appendChild(tip);
 let tipTimer=null, tipFor=null;
 function showTip(el){
-  const i=BYMN[el.dataset.tip]; if(!i) return;
-  tip.innerHTML='<div class="tip-h"><code>'+esc(i.asm)+'</code><span class="tag">'+esc(i.ext)+'</span></div><div>'+esc(DESC[i.mn]||"No description available.")+'</div>';
+  const i=BYKEY[el.dataset.tip]; if(!i) return;
+  const exts=EXTS_OF[i.mn+"@"+i.match]||[i.ext];
+  tip.innerHTML='<div class="tip-h"><code>'+esc(i.asm)+'</code>'+exts.map(x=>'<span class="tag">'+esc(x)+'</span>').join("")+'</div><div>'+esc(DESC[i.mn]||"No description available.")+'</div>';
   const r=el.getBoundingClientRect(), tw=tip.offsetWidth, th=tip.offsetHeight;
   const x=Math.min(Math.max(8,r.left), innerWidth-tw-8);
-  let y=r.bottom+6; if(y+th>innerHeight-8) y=Math.max(8,r.top-th-6);
+  let y=r.bottom+8; if(y+th>innerHeight-8) y=Math.max(8,r.top-th-8);
   tip.style.left=x+"px"; tip.style.top=y+"px"; tip.classList.add("on");
   tipFor=el; el.setAttribute("aria-describedby","tip");
 }
-function hideTip(){
-  clearTimeout(tipTimer); tip.classList.remove("on");
-  if(tipFor){ tipFor.removeAttribute("aria-describedby"); tipFor=null; }
-}
+function hideTip(){ clearTimeout(tipTimer); tip.classList.remove("on"); if(tipFor){ tipFor.removeAttribute("aria-describedby"); tipFor=null; } }
 document.addEventListener("mouseover",e=>{
   const el=e.target.closest("[data-tip]"); if(el&&el===tipFor) return;
   hideTip(); if(el) tipTimer=setTimeout(()=>showTip(el),350);
@@ -941,9 +1051,9 @@ document.addEventListener("focusin",e=>{ const el=e.target.closest("[data-tip]")
 document.addEventListener("focusout",hideTip);
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") hideTip(); });
 addEventListener("scroll",hideTip,true);
-window.__showTip=showTip; // used by self-checks
+window.__showTip=showTip; window.__data={groups,DESC,TREE,leavesOf}; // used by self-checks
 
-renderSidebar(); render();
+renderTree(); render();
 })();
 </script>
 </body>

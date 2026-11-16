@@ -658,6 +658,426 @@ sm4ed|SM4 encryption/decryption round step: S-box on byte bs of rs2, linear tran
 sm4ks|SM4 key-schedule step: S-box on byte bs of rs2, linear transform L', XORed with rs1.
 sm3p0|SM3 P0 permutation: rd = rs1 ^ rol(rs1, 9) ^ rol(rs1, 17).
 sm3p1|SM3 P1 permutation: rd = rs1 ^ rol(rs1, 15) ^ rol(rs1, 23).
+vsetivli|Set vector length and type with an immediate AVL (uimm) and immediate vtype; rd = new vl.
+vsetvli|Set vector length and type: AVL from rs1 (rs1 = x0: keep/maximise), vtype from the immediate; rd = new vl.
+vsetvl|Set vector length and type from registers: AVL from rs1, vtype from rs2; rd = new vl.
+vlm.v|Mask load: transfers ceil(vl/8) bytes between memory at rs1 and vd.
+vsm.v|Mask store: transfers ceil(vl/8) bytes between memory at rs1 and vs3.
+vle8.v|Unit-stride load, EEW = 8. nf > 0 selects the segment form vlseg<nf+1>e8.v.
+vle16.v|Unit-stride load, EEW = 16. nf > 0 selects the segment form vlseg<nf+1>e16.v.
+vle32.v|Unit-stride load, EEW = 32. nf > 0 selects the segment form vlseg<nf+1>e32.v.
+vle64.v|Unit-stride load, EEW = 64. nf > 0 selects the segment form vlseg<nf+1>e64.v.
+vse8.v|Unit-stride store, EEW = 8. nf > 0 selects the segment form vsseg<nf+1>e8.v.
+vse16.v|Unit-stride store, EEW = 16. nf > 0 selects the segment form vsseg<nf+1>e16.v.
+vse32.v|Unit-stride store, EEW = 32. nf > 0 selects the segment form vsseg<nf+1>e32.v.
+vse64.v|Unit-stride store, EEW = 64. nf > 0 selects the segment form vsseg<nf+1>e64.v.
+vluxei8.v|Unordered indexed load: element i at rs1 + vs2[i] (index EEW = 8). nf > 0 selects the segment form.
+vluxei16.v|Unordered indexed load: element i at rs1 + vs2[i] (index EEW = 16). nf > 0 selects the segment form.
+vluxei32.v|Unordered indexed load: element i at rs1 + vs2[i] (index EEW = 32). nf > 0 selects the segment form.
+vluxei64.v|Unordered indexed load: element i at rs1 + vs2[i] (index EEW = 64). nf > 0 selects the segment form.
+vsuxei8.v|Unordered indexed store: element i at rs1 + vs2[i] (index EEW = 8). nf > 0 selects the segment form.
+vsuxei16.v|Unordered indexed store: element i at rs1 + vs2[i] (index EEW = 16). nf > 0 selects the segment form.
+vsuxei32.v|Unordered indexed store: element i at rs1 + vs2[i] (index EEW = 32). nf > 0 selects the segment form.
+vsuxei64.v|Unordered indexed store: element i at rs1 + vs2[i] (index EEW = 64). nf > 0 selects the segment form.
+vlse8.v|Strided load, EEW = 8: element i at rs1 + i × rs2. nf > 0 selects the segment form.
+vlse16.v|Strided load, EEW = 16: element i at rs1 + i × rs2. nf > 0 selects the segment form.
+vlse32.v|Strided load, EEW = 32: element i at rs1 + i × rs2. nf > 0 selects the segment form.
+vlse64.v|Strided load, EEW = 64: element i at rs1 + i × rs2. nf > 0 selects the segment form.
+vsse8.v|Strided store, EEW = 8: element i at rs1 + i × rs2. nf > 0 selects the segment form.
+vsse16.v|Strided store, EEW = 16: element i at rs1 + i × rs2. nf > 0 selects the segment form.
+vsse32.v|Strided store, EEW = 32: element i at rs1 + i × rs2. nf > 0 selects the segment form.
+vsse64.v|Strided store, EEW = 64: element i at rs1 + i × rs2. nf > 0 selects the segment form.
+vloxei8.v|Ordered indexed load: element i at rs1 + vs2[i] (index EEW = 8). nf > 0 selects the segment form.
+vloxei16.v|Ordered indexed load: element i at rs1 + vs2[i] (index EEW = 16). nf > 0 selects the segment form.
+vloxei32.v|Ordered indexed load: element i at rs1 + vs2[i] (index EEW = 32). nf > 0 selects the segment form.
+vloxei64.v|Ordered indexed load: element i at rs1 + vs2[i] (index EEW = 64). nf > 0 selects the segment form.
+vsoxei8.v|Ordered indexed store: element i at rs1 + vs2[i] (index EEW = 8). nf > 0 selects the segment form.
+vsoxei16.v|Ordered indexed store: element i at rs1 + vs2[i] (index EEW = 16). nf > 0 selects the segment form.
+vsoxei32.v|Ordered indexed store: element i at rs1 + vs2[i] (index EEW = 32). nf > 0 selects the segment form.
+vsoxei64.v|Ordered indexed store: element i at rs1 + vs2[i] (index EEW = 64). nf > 0 selects the segment form.
+vle8ff.v|Unit-stride load, EEW = 8, fault-only-first (faults after element 0 shrink vl instead of trapping). nf > 0 selects the segment form vlseg<nf+1>e8.v.
+vle16ff.v|Unit-stride load, EEW = 16, fault-only-first (faults after element 0 shrink vl instead of trapping). nf > 0 selects the segment form vlseg<nf+1>e16.v.
+vle32ff.v|Unit-stride load, EEW = 32, fault-only-first (faults after element 0 shrink vl instead of trapping). nf > 0 selects the segment form vlseg<nf+1>e32.v.
+vle64ff.v|Unit-stride load, EEW = 64, fault-only-first (faults after element 0 shrink vl instead of trapping). nf > 0 selects the segment form vlseg<nf+1>e64.v.
+vl1re8.v|Whole-register load of 1 vector register (EEW = 8): ignores vl/vtype.
+vl1re16.v|Whole-register load of 1 vector register (EEW = 16): ignores vl/vtype.
+vl1re32.v|Whole-register load of 1 vector register (EEW = 32): ignores vl/vtype.
+vl1re64.v|Whole-register load of 1 vector register (EEW = 64): ignores vl/vtype.
+vl2re8.v|Whole-register load of 2 vector registers (EEW = 8): ignores vl/vtype.
+vl2re16.v|Whole-register load of 2 vector registers (EEW = 16): ignores vl/vtype.
+vl2re32.v|Whole-register load of 2 vector registers (EEW = 32): ignores vl/vtype.
+vl2re64.v|Whole-register load of 2 vector registers (EEW = 64): ignores vl/vtype.
+vl4re8.v|Whole-register load of 4 vector registers (EEW = 8): ignores vl/vtype.
+vl4re16.v|Whole-register load of 4 vector registers (EEW = 16): ignores vl/vtype.
+vl4re32.v|Whole-register load of 4 vector registers (EEW = 32): ignores vl/vtype.
+vl4re64.v|Whole-register load of 4 vector registers (EEW = 64): ignores vl/vtype.
+vl8re8.v|Whole-register load of 8 vector registers (EEW = 8): ignores vl/vtype.
+vl8re16.v|Whole-register load of 8 vector registers (EEW = 16): ignores vl/vtype.
+vl8re32.v|Whole-register load of 8 vector registers (EEW = 32): ignores vl/vtype.
+vl8re64.v|Whole-register load of 8 vector registers (EEW = 64): ignores vl/vtype.
+vs1r.v|Whole-register store of 1 vector register: ignores vl/vtype.
+vs2r.v|Whole-register store of 2 vector registers: ignores vl/vtype.
+vs4r.v|Whole-register store of 4 vector registers: ignores vl/vtype.
+vs8r.v|Whole-register store of 8 vector registers: ignores vl/vtype.
+vfadd.vf|FP add (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfsub.vf|FP subtract (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmin.vf|FP minimum (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmax.vf|FP maximum (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfsgnj.vf|FP sign injection (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfsgnjn.vf|FP negated sign injection (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfsgnjx.vf|FP XOR sign injection (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfslide1up.vf|Slide up by one, inserting f[rs1] at element 0 (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfslide1down.vf|Slide down by one, inserting f[rs1] at the top element (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmv.s.f|Move an FP register into element 0: vd[0] = f[rs1].
+vfmerge.vfm|FP merge: vd[i] = v0[i] ? f[rs1] : vs2[i] (vector-scalar f[rs1], using mask v0).
+vfmv.v.f|Splat FP scalar: vd[i] = f[rs1].
+vmfeq.vf|FP compare equal, writes a mask (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmfle.vf|FP compare less or equal, writes a mask (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmflt.vf|FP compare less than, writes a mask (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmfne.vf|FP compare not equal, writes a mask (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmfgt.vf|FP compare greater than, writes a mask (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmfge.vf|FP compare greater or equal, writes a mask (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfdiv.vf|FP divide (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfrdiv.vf|FP reverse divide: vd = f[rs1] / vs2 (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmul.vf|FP multiply (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfrsub.vf|FP reverse subtract: vd = f[rs1] - vs2 (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmadd.vf|FP multiply-add, overwrite multiplicand: vd = +(op1 × vd) + vs2 (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfnmadd.vf|FP negated multiply-add: vd = -(op1 × vd) - vs2 (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmsub.vf|FP multiply-subtract, overwrite multiplicand: vd = +(op1 × vd) - vs2 (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfnmsub.vf|FP negated multiply-subtract: vd = -(op1 × vd) + vs2 (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmacc.vf|FP multiply-add: vd = +(op1 × vs2) + vd (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfnmacc.vf|FP negated multiply-add: vd = -(op1 × vs2) - vd (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmsac.vf|FP multiply-subtract: vd = +(op1 × vs2) - vd (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfnmsac.vf|FP negated multiply-subtract: vd = -(op1 × vs2) + vd (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwadd.vf|Widening FP add (2·SEW result) (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwsub.vf|Widening FP subtract (2·SEW result) (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwadd.wf|Widening FP add (2·SEW result) (wide vs2 (2·SEW) with f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwsub.wf|Widening FP subtract (2·SEW result) (wide vs2 (2·SEW) with f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwmul.vf|Widening FP multiply (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwmacc.vf|Widening FP multiply-add (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwnmacc.vf|Widening FP negated multiply-add (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwmsac.vf|Widening FP multiply-subtract (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwnmsac.vf|Widening FP negated multiply-subtract (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfadd.vv|FP add (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfredusum.vs|FP unordered sum reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfsub.vv|FP subtract (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfredosum.vs|FP ordered sum reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmin.vv|FP minimum (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfredmin.vs|FP minimum reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmax.vv|FP maximum (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfredmax.vs|FP maximum reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfsgnj.vv|FP sign injection (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfsgnjn.vv|FP negated sign injection (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfsgnjx.vv|FP XOR sign injection (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmv.f.s|Move element 0 to an FP register: fd = vs2[0].
+vmfeq.vv|FP compare equal, writes a mask (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmfle.vv|FP compare less or equal, writes a mask (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmflt.vv|FP compare less than, writes a mask (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmfne.vv|FP compare not equal, writes a mask (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfdiv.vv|FP divide (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmul.vv|FP multiply (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmadd.vv|FP multiply-add, overwrite multiplicand: vd = +(op1 × vd) + vs2 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfnmadd.vv|FP negated multiply-add: vd = -(op1 × vd) - vs2 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmsub.vv|FP multiply-subtract, overwrite multiplicand: vd = +(op1 × vd) - vs2 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfnmsub.vv|FP negated multiply-subtract: vd = -(op1 × vd) + vs2 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmacc.vv|FP multiply-add: vd = +(op1 × vs2) + vd (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfnmacc.vv|FP negated multiply-add: vd = -(op1 × vs2) - vd (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfmsac.vv|FP multiply-subtract: vd = +(op1 × vs2) - vd (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfnmsac.vv|FP negated multiply-subtract: vd = -(op1 × vs2) + vd (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfcvt.xu.f.v|Convert FP → unsigned integer (same width), rounded per frm. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfcvt.x.f.v|Convert FP → signed integer (same width), rounded per frm. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfcvt.f.xu.v|Convert unsigned integer → FP (same width). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfcvt.f.x.v|Convert signed integer → FP (same width). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfcvt.rtz.xu.f.v|Convert FP → unsigned integer (same width), rounding toward zero. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfcvt.rtz.x.f.v|Convert FP → signed integer (same width), rounding toward zero. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwcvt.xu.f.v|Widening convert FP → unsigned integer (2·SEW). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwcvt.x.f.v|Widening convert FP → signed integer (2·SEW). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwcvt.f.xu.v|Widening convert unsigned integer → FP (2·SEW). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwcvt.f.x.v|Widening convert signed integer → FP (2·SEW). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwcvt.f.f.v|Widening convert FP → FP (2·SEW, exact). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwcvt.rtz.xu.f.v|Widening convert FP → unsigned integer (2·SEW), rounding toward zero. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwcvt.rtz.x.f.v|Widening convert FP → signed integer (2·SEW), rounding toward zero. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfncvt.xu.f.w|Narrowing convert FP (2·SEW) → unsigned integer (SEW). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfncvt.x.f.w|Narrowing convert FP (2·SEW) → signed integer (SEW). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfncvt.f.xu.w|Narrowing convert unsigned integer (2·SEW) → FP (SEW). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfncvt.f.x.w|Narrowing convert signed integer (2·SEW) → FP (SEW). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfncvt.f.f.w|Narrowing convert FP (2·SEW) → FP (SEW), rounded per frm. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfncvt.rod.f.f.w|Narrowing convert FP (2·SEW) → FP (SEW), rounding to odd. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfncvt.rtz.xu.f.w|Narrowing convert FP (2·SEW) → unsigned integer (SEW), rounding toward zero. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfncvt.rtz.x.f.w|Narrowing convert FP (2·SEW) → signed integer (SEW), rounding toward zero. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfsqrt.v|FP square root (unary). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfrsqrt7.v|FP reciprocal square-root estimate (7 bits) (unary). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfrec7.v|FP reciprocal estimate (7 bits) (unary). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfclass.v|FP classify (10-bit class mask per element) (unary). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwadd.vv|Widening FP add (2·SEW result) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwredusum.vs|Widening FP unordered sum reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwsub.vv|Widening FP subtract (2·SEW result) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwredosum.vs|Widening FP ordered sum reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwadd.wv|Widening FP add (2·SEW result) (wide vs2 (2·SEW) with vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwsub.wv|Widening FP subtract (2·SEW result) (wide vs2 (2·SEW) with vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwmul.vv|Widening FP multiply (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwmacc.vv|Widening FP multiply-add (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwnmacc.vv|Widening FP negated multiply-add (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwmsac.vv|Widening FP multiply-subtract (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwnmsac.vv|Widening FP negated multiply-subtract (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vadd.vx|Add (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsub.vx|Subtract (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrsub.vx|Reverse subtract: vd = scalar/imm - vs2 (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vminu.vx|Unsigned minimum (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmin.vx|Signed minimum (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmaxu.vx|Unsigned maximum (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmax.vx|Signed maximum (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vand.vx|Bitwise AND (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vor.vx|Bitwise OR (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vxor.vx|Bitwise XOR (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrgather.vx|Register gather: vd[i] = vs2[index[i]] (0 if index ≥ VLMAX) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vslideup.vx|Slide up: vd[i + offset] = vs2[i] (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vslidedown.vx|Slide down: vd[i] = vs2[i + offset] (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vadc.vxm|Add with carry-in from mask v0 (vector-scalar x[rs1], using mask v0).
+vmadc.vxm|Carry-out of add (optionally with carry-in from v0), written as a mask (vector-scalar x[rs1], using mask v0).
+vmadc.vx|Carry-out of add (optionally with carry-in from v0), written as a mask (vector-scalar: op1 = x[rs1]).
+vsbc.vxm|Subtract with borrow-in from mask v0 (vector-scalar x[rs1], using mask v0).
+vmsbc.vxm|Borrow-out of subtract (optionally with borrow-in from v0), written as a mask (vector-scalar x[rs1], using mask v0).
+vmsbc.vx|Borrow-out of subtract (optionally with borrow-in from v0), written as a mask (vector-scalar: op1 = x[rs1]).
+vmerge.vxm|Merge: vd[i] = v0[i] ? op1[i] : vs2[i] (vector-scalar x[rs1], using mask v0).
+vmv.v.x|Splat integer: vd[i] = x[rs1].
+vmseq.vx|Compare equal, writes a mask (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsne.vx|Compare not equal, writes a mask (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsltu.vx|Compare unsigned less than, writes a mask (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmslt.vx|Compare signed less than, writes a mask (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsleu.vx|Compare unsigned less or equal, writes a mask (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsle.vx|Compare signed less or equal, writes a mask (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsgtu.vx|Compare unsigned greater than, writes a mask (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsgt.vx|Compare signed greater than, writes a mask (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsaddu.vx|Saturating unsigned add (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsadd.vx|Saturating signed add (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vssubu.vx|Saturating unsigned subtract (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vssub.vx|Saturating signed subtract (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsll.vx|Shift left logical (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsmul.vx|Signed fractional multiply with rounding and saturation (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsrl.vx|Shift right logical (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsra.vx|Shift right arithmetic (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vssrl.vx|Scaling shift right logical (rounded per vxrm) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vssra.vx|Scaling shift right arithmetic (rounded per vxrm) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnsrl.wx|Narrowing shift right logical: 2·SEW source, SEW result (wide vs2 (2·SEW) with x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnsra.wx|Narrowing shift right arithmetic: 2·SEW source, SEW result (wide vs2 (2·SEW) with x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnclipu.wx|Narrowing unsigned fixed-point clip (rounded, saturated) (wide vs2 (2·SEW) with x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnclip.wx|Narrowing signed fixed-point clip (rounded, saturated) (wide vs2 (2·SEW) with x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vadd.vv|Add (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsub.vv|Subtract (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vminu.vv|Unsigned minimum (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmin.vv|Signed minimum (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmaxu.vv|Unsigned maximum (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmax.vv|Signed maximum (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vand.vv|Bitwise AND (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vor.vv|Bitwise OR (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vxor.vv|Bitwise XOR (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrgather.vv|Register gather: vd[i] = vs2[index[i]] (0 if index ≥ VLMAX) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrgatherei16.vv|Register gather with 16-bit indices from vs1 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vadc.vvm|Add with carry-in from mask v0 (vector-vector, using mask v0).
+vmadc.vvm|Carry-out of add (optionally with carry-in from v0), written as a mask (vector-vector, using mask v0).
+vmadc.vv|Carry-out of add (optionally with carry-in from v0), written as a mask (vector-vector: op1 = vs1).
+vsbc.vvm|Subtract with borrow-in from mask v0 (vector-vector, using mask v0).
+vmsbc.vvm|Borrow-out of subtract (optionally with borrow-in from v0), written as a mask (vector-vector, using mask v0).
+vmsbc.vv|Borrow-out of subtract (optionally with borrow-in from v0), written as a mask (vector-vector: op1 = vs1).
+vmerge.vvm|Merge: vd[i] = v0[i] ? op1[i] : vs2[i] (vector-vector, using mask v0).
+vmv.v.v|Copy vector: vd[i] = vs1[i].
+vmseq.vv|Compare equal, writes a mask (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsne.vv|Compare not equal, writes a mask (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsltu.vv|Compare unsigned less than, writes a mask (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmslt.vv|Compare signed less than, writes a mask (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsleu.vv|Compare unsigned less or equal, writes a mask (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsle.vv|Compare signed less or equal, writes a mask (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsaddu.vv|Saturating unsigned add (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsadd.vv|Saturating signed add (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vssubu.vv|Saturating unsigned subtract (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vssub.vv|Saturating signed subtract (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsll.vv|Shift left logical (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsmul.vv|Signed fractional multiply with rounding and saturation (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsrl.vv|Shift right logical (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsra.vv|Shift right arithmetic (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vssrl.vv|Scaling shift right logical (rounded per vxrm) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vssra.vv|Scaling shift right arithmetic (rounded per vxrm) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnsrl.wv|Narrowing shift right logical: 2·SEW source, SEW result (wide vs2 (2·SEW) with vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnsra.wv|Narrowing shift right arithmetic: 2·SEW source, SEW result (wide vs2 (2·SEW) with vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnclipu.wv|Narrowing unsigned fixed-point clip (rounded, saturated) (wide vs2 (2·SEW) with vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnclip.wv|Narrowing signed fixed-point clip (rounded, saturated) (wide vs2 (2·SEW) with vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwredsumu.vs|Widening unsigned sum reduction (2·SEW accumulator) (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwredsum.vs|Widening signed sum reduction (2·SEW accumulator) (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vadd.vi|Add (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrsub.vi|Reverse subtract: vd = scalar/imm - vs2 (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vand.vi|Bitwise AND (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vor.vi|Bitwise OR (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vxor.vi|Bitwise XOR (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrgather.vi|Register gather: vd[i] = vs2[index[i]] (0 if index ≥ VLMAX) (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vslideup.vi|Slide up: vd[i + offset] = vs2[i] (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vslidedown.vi|Slide down: vd[i] = vs2[i + offset] (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vadc.vim|Add with carry-in from mask v0 (vector-immediate, using mask v0).
+vmadc.vim|Carry-out of add (optionally with carry-in from v0), written as a mask (vector-immediate, using mask v0).
+vmadc.vi|Carry-out of add (optionally with carry-in from v0), written as a mask (vector-immediate: op1 = imm).
+vmerge.vim|Merge: vd[i] = v0[i] ? op1[i] : vs2[i] (vector-immediate, using mask v0).
+vmv.v.i|Splat immediate: vd[i] = simm5.
+vmseq.vi|Compare equal, writes a mask (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsne.vi|Compare not equal, writes a mask (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsleu.vi|Compare unsigned less or equal, writes a mask (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsle.vi|Compare signed less or equal, writes a mask (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsgtu.vi|Compare unsigned greater than, writes a mask (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsgt.vi|Compare signed greater than, writes a mask (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsaddu.vi|Saturating unsigned add (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsadd.vi|Saturating signed add (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsll.vi|Shift left logical (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmv1r.v|Whole-register move of 1 vector register (unary).
+vmv2r.v|Whole-register move of 2 vector registers (unary).
+vmv4r.v|Whole-register move of 4 vector registers (unary).
+vmv8r.v|Whole-register move of 8 vector registers (unary).
+vsrl.vi|Shift right logical (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsra.vi|Shift right arithmetic (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vssrl.vi|Scaling shift right logical (rounded per vxrm) (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vssra.vi|Scaling shift right arithmetic (rounded per vxrm) (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnsrl.wi|Narrowing shift right logical: 2·SEW source, SEW result (wide vs2 (2·SEW) with an immediate). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnsra.wi|Narrowing shift right arithmetic: 2·SEW source, SEW result (wide vs2 (2·SEW) with an immediate). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnclipu.wi|Narrowing unsigned fixed-point clip (rounded, saturated) (wide vs2 (2·SEW) with an immediate). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnclip.wi|Narrowing signed fixed-point clip (rounded, saturated) (wide vs2 (2·SEW) with an immediate). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vredsum.vs|Sum reduction: vd[0] = vs1[0] + Σ vs2[i] (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vredand.vs|AND reduction: vd[0] = vs1[0] & all vs2[i] (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vredor.vs|OR reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vredxor.vs|XOR reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vredminu.vs|Unsigned minimum reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vredmin.vs|Signed minimum reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vredmaxu.vs|Unsigned maximum reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vredmax.vs|Signed maximum reduction (vs1[0] / element group 0 of vs2 as scalar operand). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vaaddu.vv|Averaging unsigned add (rounded per vxrm) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vaadd.vv|Averaging signed add (rounded per vxrm) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vasubu.vv|Averaging unsigned subtract (rounded per vxrm) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vasub.vv|Averaging signed subtract (rounded per vxrm) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmv.x.s|Move element 0 to an integer register: rd = vs2[0] (sign-extended / truncated to XLEN).
+vzext.vf8|Zero-extend each element from SEW/2, SEW/4 or SEW/8 (vf2/vf4/vf8) (from SEW/8). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsext.vf8|Sign-extend each element from SEW/2, SEW/4 or SEW/8 (vf2/vf4/vf8) (from SEW/8). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vzext.vf4|Zero-extend each element from SEW/2, SEW/4 or SEW/8 (vf2/vf4/vf8) (from SEW/4). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsext.vf4|Sign-extend each element from SEW/2, SEW/4 or SEW/8 (vf2/vf4/vf8) (from SEW/4). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vzext.vf2|Zero-extend each element from SEW/2, SEW/4 or SEW/8 (vf2/vf4/vf8) (from SEW/2). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vsext.vf2|Sign-extend each element from SEW/2, SEW/4 or SEW/8 (vf2/vf4/vf8) (from SEW/2). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vcompress.vm|Compress: pack the elements of vs2 selected by mask vs1 contiguously into vd (mask vs1 selects elements).
+vmandn.mm|Mask AND-NOT: vd = vs2 & ~vs1 (mask-mask).
+vmand.mm|Mask AND (mask-mask).
+vmor.mm|Mask OR (mask-mask).
+vmxor.mm|Mask XOR (mask-mask).
+vmorn.mm|Mask OR-NOT: vd = vs2 | ~vs1 (mask-mask).
+vmnand.mm|Mask NAND (mask-mask).
+vmnor.mm|Mask NOR (mask-mask).
+vmxnor.mm|Mask XNOR (mask-mask).
+vmsbf.m|Set-before-first mask bit (mask source). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsof.m|Set-only-first mask bit (mask source). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmsif.m|Set-including-first mask bit (mask source). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+viota.m|Iota: vd[i] = number of set mask bits in vs2 below element i (mask source). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vid.v|Element index: vd[i] = i (unary). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vcpop.m|Count set mask bits: rd = number of active elements of vs2 with mask bit 1 (mask source). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfirst.m|Find first set mask bit: rd = index of the first active set bit in vs2, or -1 (mask source). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vdivu.vv|Unsigned divide (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vdiv.vv|Signed divide (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vremu.vv|Unsigned remainder (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrem.vv|Signed remainder (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmulhu.vv|Multiply unsigned, high SEW bits (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmul.vv|Multiply, low SEW bits (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmulhsu.vv|Multiply signed × unsigned, high SEW bits (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmulh.vv|Multiply signed, high SEW bits (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmadd.vv|Multiply-add, overwrite multiplicand: vd = (op1 × vd) + vs2 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnmsub.vv|Multiply-subtract, overwrite multiplicand: vd = -(op1 × vd) + vs2 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmacc.vv|Multiply-add, overwrite addend: vd = (op1 × vs2) + vd (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnmsac.vv|Multiply-subtract, overwrite minuend: vd = -(op1 × vs2) + vd (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwaddu.vv|Widening unsigned add (2·SEW result) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwadd.vv|Widening signed add (2·SEW result) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsubu.vv|Widening unsigned subtract (2·SEW result) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsub.vv|Widening signed subtract (2·SEW result) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwaddu.wv|Widening unsigned add (2·SEW result) (wide vs2 (2·SEW) with vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwadd.wv|Widening signed add (2·SEW result) (wide vs2 (2·SEW) with vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsubu.wv|Widening unsigned subtract (2·SEW result) (wide vs2 (2·SEW) with vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsub.wv|Widening signed subtract (2·SEW result) (wide vs2 (2·SEW) with vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmulu.vv|Widening unsigned multiply (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmulsu.vv|Widening signed × unsigned multiply (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmul.vv|Widening signed multiply (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmaccu.vv|Widening unsigned multiply-add: vd(2·SEW) += op1 × vs2 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmacc.vv|Widening signed multiply-add: vd(2·SEW) += op1 × vs2 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmaccsu.vv|Widening signed(op1) × unsigned(vs2) multiply-add (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vaaddu.vx|Averaging unsigned add (rounded per vxrm) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vaadd.vx|Averaging signed add (rounded per vxrm) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vasubu.vx|Averaging unsigned subtract (rounded per vxrm) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vasub.vx|Averaging signed subtract (rounded per vxrm) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmv.s.x|Move an integer register into element 0: vd[0] = x[rs1].
+vslide1up.vx|Slide up by one, inserting x[rs1] at element 0 (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vslide1down.vx|Slide down by one, inserting x[rs1] at the top element (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vdivu.vx|Unsigned divide (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vdiv.vx|Signed divide (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vremu.vx|Unsigned remainder (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrem.vx|Signed remainder (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmulhu.vx|Multiply unsigned, high SEW bits (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmul.vx|Multiply, low SEW bits (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmulhsu.vx|Multiply signed × unsigned, high SEW bits (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmulh.vx|Multiply signed, high SEW bits (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmadd.vx|Multiply-add, overwrite multiplicand: vd = (op1 × vd) + vs2 (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnmsub.vx|Multiply-subtract, overwrite multiplicand: vd = -(op1 × vd) + vs2 (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vmacc.vx|Multiply-add, overwrite addend: vd = (op1 × vs2) + vd (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vnmsac.vx|Multiply-subtract, overwrite minuend: vd = -(op1 × vs2) + vd (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwaddu.vx|Widening unsigned add (2·SEW result) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwadd.vx|Widening signed add (2·SEW result) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsubu.vx|Widening unsigned subtract (2·SEW result) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsub.vx|Widening signed subtract (2·SEW result) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwaddu.wx|Widening unsigned add (2·SEW result) (wide vs2 (2·SEW) with x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwadd.wx|Widening signed add (2·SEW result) (wide vs2 (2·SEW) with x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsubu.wx|Widening unsigned subtract (2·SEW result) (wide vs2 (2·SEW) with x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsub.wx|Widening signed subtract (2·SEW result) (wide vs2 (2·SEW) with x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmulu.vx|Widening unsigned multiply (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmulsu.vx|Widening signed × unsigned multiply (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmul.vx|Widening signed multiply (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmaccu.vx|Widening unsigned multiply-add: vd(2·SEW) += op1 × vs2 (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmacc.vx|Widening signed multiply-add: vd(2·SEW) += op1 × vs2 (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmaccus.vx|Widening unsigned(op1) × signed(vs2) multiply-add (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwmaccsu.vx|Widening signed(op1) × unsigned(vs2) multiply-add (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfncvtbf16.f.f.w|Narrowing convert FP32 → BFloat16. Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwcvtbf16.f.f.v|Widening convert BFloat16 → FP32 (exact). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwmaccbf16.vv|Widening BFloat16 multiply-add into FP32: vd(FP32) += op1 × vs2 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vfwmaccbf16.vf|Widening BFloat16 multiply-add into FP32: vd(FP32) += op1 × vs2 (vector-scalar: op1 = f[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vandn.vv|AND-NOT: vd = vs2 & ~op1 (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vandn.vx|AND-NOT: vd = vs2 & ~op1 (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vbrev8.v|Reverse the bits within each byte (unary). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrev8.v|Reverse the bytes in each element (unary). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrol.vv|Rotate left (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vrol.vx|Rotate left (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vror.vv|Rotate right (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vror.vx|Rotate right (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vror.vi|Rotate right (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vbrev.v|Reverse all bits in each element (unary). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vclz.v|Count leading zeros per element (unary). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vctz.v|Count trailing zeros per element (unary). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vcpop.v|Population count per element (Zvbb). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsll.vv|Widening shift left logical (2·SEW result) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsll.vx|Widening shift left logical (2·SEW result) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vwsll.vi|Widening shift left logical (2·SEW result) (vector-immediate: op1 = imm). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vclmul.vv|Carry-less multiply, low SEW bits (SEW = 64) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vclmul.vx|Carry-less multiply, low SEW bits (SEW = 64) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vclmulh.vv|Carry-less multiply, high SEW bits (SEW = 64) (vector-vector: op1 = vs1). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vclmulh.vx|Carry-less multiply, high SEW bits (SEW = 64) (vector-scalar: op1 = x[rs1]). Masked (vm = 0: only elements with v0.mask = 1) when written with v0.t.
+vgmul.vv|GHASH multiply (GCM): vd = vd · vs2 in GF(2^128) (vector-vector: op1 = vs1).
+vghsh.vv|GHASH add-multiply (GCM): vd = (vd ^ vs1) · vs2 in GF(2^128) (vector-vector: op1 = vs1).
+vaesdf.vv|AES final-round decryption (vector-vector: op1 = vs1).
+vaesdf.vs|AES final-round decryption (vs1[0] / element group 0 of vs2 as scalar operand).
+vaesdm.vv|AES middle-round decryption (vector-vector: op1 = vs1).
+vaesdm.vs|AES middle-round decryption (vs1[0] / element group 0 of vs2 as scalar operand).
+vaesef.vv|AES final-round encryption (vector-vector: op1 = vs1).
+vaesef.vs|AES final-round encryption (vs1[0] / element group 0 of vs2 as scalar operand).
+vaesem.vv|AES middle-round encryption (vector-vector: op1 = vs1).
+vaesem.vs|AES middle-round encryption (vs1[0] / element group 0 of vs2 as scalar operand).
+vaesz.vs|AES round zero: vd = vd ^ round key (AddRoundKey) (vs1[0] / element group 0 of vs2 as scalar operand).
+vaeskf1.vi|AES-128 forward key-schedule round (round number in uimm) (vector-immediate: op1 = imm).
+vaeskf2.vi|AES-256 forward key-schedule round (round number in uimm) (vector-immediate: op1 = imm).
+vsha2ms.vv|SHA-2 message schedule (4 words) (vector-vector: op1 = vs1).
+vsha2ch.vv|SHA-2 two compression rounds, using the high message-schedule words (vector-vector: op1 = vs1).
+vsha2cl.vv|SHA-2 two compression rounds, using the low message-schedule words (vector-vector: op1 = vs1).
+vsm4k.vi|SM4 key expansion (4 round keys, round group in uimm) (vector-immediate: op1 = imm).
+vsm4r.vv|SM4 four encryption rounds (vector-vector: op1 = vs1).
+vsm4r.vs|SM4 four encryption rounds (vs1[0] / element group 0 of vs2 as scalar operand).
+vsm3c.vi|SM3 compression, two rounds (round number in uimm) (vector-immediate: op1 = imm).
+vsm3me.vv|SM3 message expansion (8 words) (vector-vector: op1 = vs1).
 ld|Load doubleword into an even/odd register pair (RV32 Zilsd): {rd+1, rd} = M[rs1 + sext(offset)][63:0]; rd must be even.
 sd|Store doubleword from an even/odd register pair (RV32 Zilsd): M[rs1 + sext(offset)] = {rs2+1, rs2}; rs2 must be even.
 c.ld|Compressed ld into an even register pair (Zclsd); offset is a multiple of 8. Reuses the c.flw encoding.
@@ -1196,6 +1616,448 @@ sm4ks         |R|sm4ks rd, rs1, rs2, bs|31..30:bs 29..25=0x1a:funct5 24..20:rs2 
 # Zksh | Zksh – ShangMi SM3 Hash | Ch. 30
 sm3p0         |I|sm3p0 rd, rs1|31..25=0x8 24..20=0x8 19..15:rs1 14..12=0x1 11..7:rd 6..0=0x13
 sm3p1         |I|sm3p1 rd, rs1|31..25=0x8 24..20=0x9 19..15:rs1 14..12=0x1 11..7:rd 6..0=0x13
+
+# V | "V" Vector Extension | Ch. 31 – vm = 0 means masked by v0.t; nf > 0 on loads/stores selects the segment variants
+vsetivli      |OPCFG|vsetivli rd, uimm, vtypei|31=0x1 30=0x1 29..20:vtypei 19..15:uimm[4:0] 14..12=0x7:funct3 11..7:rd 6..0=0x57
+vsetvli       |OPCFG|vsetvli rd, rs1, vtypei|31=0x0 30..20:vtypei 19..15:rs1 14..12=0x7:funct3 11..7:rd 6..0=0x57
+vsetvl        |OPCFG|vsetvl rd, rs1, rs2|31=0x1 30..25=0x0 24..20:rs2 19..15:rs1 14..12=0x7:funct3 11..7:rd 6..0=0x57
+vlm.v         |VL|vlm.v vd, (rs1)|31..29=0x0:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0xb:lumop 19..15:rs1 14..12=0x0:width 11..7:vd 6..0=0x7
+vsm.v         |VS|vsm.v vs3, (rs1)|31..29=0x0:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0xb:sumop 19..15:rs1 14..12=0x0:width 11..7:vs3 6..0=0x27
+vle8.v        |VL|vle8.v vd, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x0:lumop 19..15:rs1 14..12=0x0:width 11..7:vd 6..0=0x7
+vle16.v       |VL|vle16.v vd, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x0:lumop 19..15:rs1 14..12=0x5:width 11..7:vd 6..0=0x7
+vle32.v       |VL|vle32.v vd, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x0:lumop 19..15:rs1 14..12=0x6:width 11..7:vd 6..0=0x7
+vle64.v       |VL|vle64.v vd, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x0:lumop 19..15:rs1 14..12=0x7:width 11..7:vd 6..0=0x7
+vse8.v        |VS|vse8.v vs3, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x0:sumop 19..15:rs1 14..12=0x0:width 11..7:vs3 6..0=0x27
+vse16.v       |VS|vse16.v vs3, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x0:sumop 19..15:rs1 14..12=0x5:width 11..7:vs3 6..0=0x27
+vse32.v       |VS|vse32.v vs3, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x0:sumop 19..15:rs1 14..12=0x6:width 11..7:vs3 6..0=0x27
+vse64.v       |VS|vse64.v vs3, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x0:sumop 19..15:rs1 14..12=0x7:width 11..7:vs3 6..0=0x27
+vluxei8.v     |VL|vluxei8.v vd, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x1:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x0:width 11..7:vd 6..0=0x7
+vluxei16.v    |VL|vluxei16.v vd, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x1:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:width 11..7:vd 6..0=0x7
+vluxei32.v    |VL|vluxei32.v vd, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x1:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:width 11..7:vd 6..0=0x7
+vluxei64.v    |VL|vluxei64.v vd, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x1:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x7:width 11..7:vd 6..0=0x7
+vsuxei8.v     |VS|vsuxei8.v vs3, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x1:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x0:width 11..7:vs3 6..0=0x27
+vsuxei16.v    |VS|vsuxei16.v vs3, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x1:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:width 11..7:vs3 6..0=0x27
+vsuxei32.v    |VS|vsuxei32.v vs3, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x1:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:width 11..7:vs3 6..0=0x27
+vsuxei64.v    |VS|vsuxei64.v vs3, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x1:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x7:width 11..7:vs3 6..0=0x27
+vlse8.v       |VL|vlse8.v vd, (rs1), rs2, vm|31..29:nf 28=0x0:mew 27..26=0x2:mop 25:vm 24..20:rs2 19..15:rs1 14..12=0x0:width 11..7:vd 6..0=0x7
+vlse16.v      |VL|vlse16.v vd, (rs1), rs2, vm|31..29:nf 28=0x0:mew 27..26=0x2:mop 25:vm 24..20:rs2 19..15:rs1 14..12=0x5:width 11..7:vd 6..0=0x7
+vlse32.v      |VL|vlse32.v vd, (rs1), rs2, vm|31..29:nf 28=0x0:mew 27..26=0x2:mop 25:vm 24..20:rs2 19..15:rs1 14..12=0x6:width 11..7:vd 6..0=0x7
+vlse64.v      |VL|vlse64.v vd, (rs1), rs2, vm|31..29:nf 28=0x0:mew 27..26=0x2:mop 25:vm 24..20:rs2 19..15:rs1 14..12=0x7:width 11..7:vd 6..0=0x7
+vsse8.v       |VS|vsse8.v vs3, (rs1), rs2, vm|31..29:nf 28=0x0:mew 27..26=0x2:mop 25:vm 24..20:rs2 19..15:rs1 14..12=0x0:width 11..7:vs3 6..0=0x27
+vsse16.v      |VS|vsse16.v vs3, (rs1), rs2, vm|31..29:nf 28=0x0:mew 27..26=0x2:mop 25:vm 24..20:rs2 19..15:rs1 14..12=0x5:width 11..7:vs3 6..0=0x27
+vsse32.v      |VS|vsse32.v vs3, (rs1), rs2, vm|31..29:nf 28=0x0:mew 27..26=0x2:mop 25:vm 24..20:rs2 19..15:rs1 14..12=0x6:width 11..7:vs3 6..0=0x27
+vsse64.v      |VS|vsse64.v vs3, (rs1), rs2, vm|31..29:nf 28=0x0:mew 27..26=0x2:mop 25:vm 24..20:rs2 19..15:rs1 14..12=0x7:width 11..7:vs3 6..0=0x27
+vloxei8.v     |VL|vloxei8.v vd, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x3:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x0:width 11..7:vd 6..0=0x7
+vloxei16.v    |VL|vloxei16.v vd, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x3:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:width 11..7:vd 6..0=0x7
+vloxei32.v    |VL|vloxei32.v vd, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x3:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:width 11..7:vd 6..0=0x7
+vloxei64.v    |VL|vloxei64.v vd, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x3:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x7:width 11..7:vd 6..0=0x7
+vsoxei8.v     |VS|vsoxei8.v vs3, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x3:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x0:width 11..7:vs3 6..0=0x27
+vsoxei16.v    |VS|vsoxei16.v vs3, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x3:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:width 11..7:vs3 6..0=0x27
+vsoxei32.v    |VS|vsoxei32.v vs3, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x3:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:width 11..7:vs3 6..0=0x27
+vsoxei64.v    |VS|vsoxei64.v vs3, (rs1), vs2, vm|31..29:nf 28=0x0:mew 27..26=0x3:mop 25:vm 24..20:vs2 19..15:rs1 14..12=0x7:width 11..7:vs3 6..0=0x27
+vle8ff.v      |VL|vle8ff.v vd, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x10:lumop 19..15:rs1 14..12=0x0:width 11..7:vd 6..0=0x7
+vle16ff.v     |VL|vle16ff.v vd, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x10:lumop 19..15:rs1 14..12=0x5:width 11..7:vd 6..0=0x7
+vle32ff.v     |VL|vle32ff.v vd, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x10:lumop 19..15:rs1 14..12=0x6:width 11..7:vd 6..0=0x7
+vle64ff.v     |VL|vle64ff.v vd, (rs1), vm|31..29:nf 28=0x0:mew 27..26=0x0:mop 25:vm 24..20=0x10:lumop 19..15:rs1 14..12=0x7:width 11..7:vd 6..0=0x7
+vl1re8.v      |VL|vl1re8.v vd, (rs1)|31..29=0x0:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x0:width 11..7:vd 6..0=0x7
+vl1re16.v     |VL|vl1re16.v vd, (rs1)|31..29=0x0:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x5:width 11..7:vd 6..0=0x7
+vl1re32.v     |VL|vl1re32.v vd, (rs1)|31..29=0x0:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x6:width 11..7:vd 6..0=0x7
+vl1re64.v     |VL|vl1re64.v vd, (rs1)|31..29=0x0:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x7:width 11..7:vd 6..0=0x7
+vl2re8.v      |VL|vl2re8.v vd, (rs1)|31..29=0x1:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x0:width 11..7:vd 6..0=0x7
+vl2re16.v     |VL|vl2re16.v vd, (rs1)|31..29=0x1:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x5:width 11..7:vd 6..0=0x7
+vl2re32.v     |VL|vl2re32.v vd, (rs1)|31..29=0x1:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x6:width 11..7:vd 6..0=0x7
+vl2re64.v     |VL|vl2re64.v vd, (rs1)|31..29=0x1:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x7:width 11..7:vd 6..0=0x7
+vl4re8.v      |VL|vl4re8.v vd, (rs1)|31..29=0x3:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x0:width 11..7:vd 6..0=0x7
+vl4re16.v     |VL|vl4re16.v vd, (rs1)|31..29=0x3:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x5:width 11..7:vd 6..0=0x7
+vl4re32.v     |VL|vl4re32.v vd, (rs1)|31..29=0x3:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x6:width 11..7:vd 6..0=0x7
+vl4re64.v     |VL|vl4re64.v vd, (rs1)|31..29=0x3:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x7:width 11..7:vd 6..0=0x7
+vl8re8.v      |VL|vl8re8.v vd, (rs1)|31..29=0x7:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x0:width 11..7:vd 6..0=0x7
+vl8re16.v     |VL|vl8re16.v vd, (rs1)|31..29=0x7:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x5:width 11..7:vd 6..0=0x7
+vl8re32.v     |VL|vl8re32.v vd, (rs1)|31..29=0x7:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x6:width 11..7:vd 6..0=0x7
+vl8re64.v     |VL|vl8re64.v vd, (rs1)|31..29=0x7:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:lumop 19..15:rs1 14..12=0x7:width 11..7:vd 6..0=0x7
+vs1r.v        |VS|vs1r.v vs3, (rs1)|31..29=0x0:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:sumop 19..15:rs1 14..12=0x0:width 11..7:vs3 6..0=0x27
+vs2r.v        |VS|vs2r.v vs3, (rs1)|31..29=0x1:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:sumop 19..15:rs1 14..12=0x0:width 11..7:vs3 6..0=0x27
+vs4r.v        |VS|vs4r.v vs3, (rs1)|31..29=0x3:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:sumop 19..15:rs1 14..12=0x0:width 11..7:vs3 6..0=0x27
+vs8r.v        |VS|vs8r.v vs3, (rs1)|31..29=0x7:nf 28=0x0:mew 27..26=0x0:mop 25=0x1:vm 24..20=0x8:sumop 19..15:rs1 14..12=0x0:width 11..7:vs3 6..0=0x27
+vfadd.vf      |OPFVF|vfadd.vf vd, vs2, fs1, vm|31..26=0x0:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfsub.vf      |OPFVF|vfsub.vf vd, vs2, fs1, vm|31..26=0x2:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfmin.vf      |OPFVF|vfmin.vf vd, vs2, fs1, vm|31..26=0x4:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfmax.vf      |OPFVF|vfmax.vf vd, vs2, fs1, vm|31..26=0x6:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfsgnj.vf     |OPFVF|vfsgnj.vf vd, vs2, fs1, vm|31..26=0x8:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfsgnjn.vf    |OPFVF|vfsgnjn.vf vd, vs2, fs1, vm|31..26=0x9:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfsgnjx.vf    |OPFVF|vfsgnjx.vf vd, vs2, fs1, vm|31..26=0xa:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfslide1up.vf |OPFVF|vfslide1up.vf vd, vs2, fs1, vm|31..26=0xe:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfslide1down.vf|OPFVF|vfslide1down.vf vd, vs2, fs1, vm|31..26=0xf:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfmv.s.f      |OPFVF|vfmv.s.f vd, fs1|31..26=0x10:funct6 25=0x1:vm 24..20=0x0:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfmerge.vfm   |OPFVF|vfmerge.vfm vd, vs2, fs1, v0|31..26=0x17:funct6 25=0x0:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfmv.v.f      |OPFVF|vfmv.v.f vd, fs1|31..26=0x17:funct6 25=0x1:vm 24..20=0x0:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vmfeq.vf      |OPFVF|vmfeq.vf vd, vs2, fs1, vm|31..26=0x18:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vmfle.vf      |OPFVF|vmfle.vf vd, vs2, fs1, vm|31..26=0x19:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vmflt.vf      |OPFVF|vmflt.vf vd, vs2, fs1, vm|31..26=0x1b:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vmfne.vf      |OPFVF|vmfne.vf vd, vs2, fs1, vm|31..26=0x1c:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vmfgt.vf      |OPFVF|vmfgt.vf vd, vs2, fs1, vm|31..26=0x1d:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vmfge.vf      |OPFVF|vmfge.vf vd, vs2, fs1, vm|31..26=0x1f:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfdiv.vf      |OPFVF|vfdiv.vf vd, vs2, fs1, vm|31..26=0x20:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfrdiv.vf     |OPFVF|vfrdiv.vf vd, vs2, fs1, vm|31..26=0x21:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfmul.vf      |OPFVF|vfmul.vf vd, vs2, fs1, vm|31..26=0x24:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfrsub.vf     |OPFVF|vfrsub.vf vd, vs2, fs1, vm|31..26=0x27:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfmadd.vf     |OPFVF|vfmadd.vf vd, fs1, vs2, vm|31..26=0x28:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfnmadd.vf    |OPFVF|vfnmadd.vf vd, fs1, vs2, vm|31..26=0x29:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfmsub.vf     |OPFVF|vfmsub.vf vd, fs1, vs2, vm|31..26=0x2a:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfnmsub.vf    |OPFVF|vfnmsub.vf vd, fs1, vs2, vm|31..26=0x2b:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfmacc.vf     |OPFVF|vfmacc.vf vd, fs1, vs2, vm|31..26=0x2c:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfnmacc.vf    |OPFVF|vfnmacc.vf vd, fs1, vs2, vm|31..26=0x2d:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfmsac.vf     |OPFVF|vfmsac.vf vd, fs1, vs2, vm|31..26=0x2e:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfnmsac.vf    |OPFVF|vfnmsac.vf vd, fs1, vs2, vm|31..26=0x2f:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfwadd.vf     |OPFVF|vfwadd.vf vd, vs2, fs1, vm|31..26=0x30:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfwsub.vf     |OPFVF|vfwsub.vf vd, vs2, fs1, vm|31..26=0x32:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfwadd.wf     |OPFVF|vfwadd.wf vd, vs2, fs1, vm|31..26=0x34:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfwsub.wf     |OPFVF|vfwsub.wf vd, vs2, fs1, vm|31..26=0x36:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfwmul.vf     |OPFVF|vfwmul.vf vd, vs2, fs1, vm|31..26=0x38:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfwmacc.vf    |OPFVF|vfwmacc.vf vd, fs1, vs2, vm|31..26=0x3c:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfwnmacc.vf   |OPFVF|vfwnmacc.vf vd, fs1, vs2, vm|31..26=0x3d:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfwmsac.vf    |OPFVF|vfwmsac.vf vd, fs1, vs2, vm|31..26=0x3e:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfwnmsac.vf   |OPFVF|vfwnmsac.vf vd, fs1, vs2, vm|31..26=0x3f:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+vfadd.vv      |OPFVV|vfadd.vv vd, vs2, vs1, vm|31..26=0x0:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfredusum.vs  |OPFVV|vfredusum.vs vd, vs2, vs1, vm|31..26=0x1:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfsub.vv      |OPFVV|vfsub.vv vd, vs2, vs1, vm|31..26=0x2:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfredosum.vs  |OPFVV|vfredosum.vs vd, vs2, vs1, vm|31..26=0x3:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfmin.vv      |OPFVV|vfmin.vv vd, vs2, vs1, vm|31..26=0x4:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfredmin.vs   |OPFVV|vfredmin.vs vd, vs2, vs1, vm|31..26=0x5:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfmax.vv      |OPFVV|vfmax.vv vd, vs2, vs1, vm|31..26=0x6:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfredmax.vs   |OPFVV|vfredmax.vs vd, vs2, vs1, vm|31..26=0x7:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfsgnj.vv     |OPFVV|vfsgnj.vv vd, vs2, vs1, vm|31..26=0x8:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfsgnjn.vv    |OPFVV|vfsgnjn.vv vd, vs2, vs1, vm|31..26=0x9:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfsgnjx.vv    |OPFVV|vfsgnjx.vv vd, vs2, vs1, vm|31..26=0xa:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfmv.f.s      |OPFVV|vfmv.f.s fd, vs2|31..26=0x10:funct6 25=0x1:vm 24..20:vs2 19..15=0x0:vs1 14..12=0x1:funct3 11..7:rd 6..0=0x57
+vmfeq.vv      |OPFVV|vmfeq.vv vd, vs2, vs1, vm|31..26=0x18:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vmfle.vv      |OPFVV|vmfle.vv vd, vs2, vs1, vm|31..26=0x19:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vmflt.vv      |OPFVV|vmflt.vv vd, vs2, vs1, vm|31..26=0x1b:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vmfne.vv      |OPFVV|vmfne.vv vd, vs2, vs1, vm|31..26=0x1c:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfdiv.vv      |OPFVV|vfdiv.vv vd, vs2, vs1, vm|31..26=0x20:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfmul.vv      |OPFVV|vfmul.vv vd, vs2, vs1, vm|31..26=0x24:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfmadd.vv     |OPFVV|vfmadd.vv vd, vs1, vs2, vm|31..26=0x28:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfnmadd.vv    |OPFVV|vfnmadd.vv vd, vs1, vs2, vm|31..26=0x29:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfmsub.vv     |OPFVV|vfmsub.vv vd, vs1, vs2, vm|31..26=0x2a:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfnmsub.vv    |OPFVV|vfnmsub.vv vd, vs1, vs2, vm|31..26=0x2b:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfmacc.vv     |OPFVV|vfmacc.vv vd, vs1, vs2, vm|31..26=0x2c:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfnmacc.vv    |OPFVV|vfnmacc.vv vd, vs1, vs2, vm|31..26=0x2d:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfmsac.vv     |OPFVV|vfmsac.vv vd, vs1, vs2, vm|31..26=0x2e:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfnmsac.vv    |OPFVV|vfnmsac.vv vd, vs1, vs2, vm|31..26=0x2f:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfcvt.xu.f.v  |OPFVV|vfcvt.xu.f.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x0:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfcvt.x.f.v   |OPFVV|vfcvt.x.f.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x1:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfcvt.f.xu.v  |OPFVV|vfcvt.f.xu.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x2:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfcvt.f.x.v   |OPFVV|vfcvt.f.x.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x3:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfcvt.rtz.xu.f.v|OPFVV|vfcvt.rtz.xu.f.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x6:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfcvt.rtz.x.f.v|OPFVV|vfcvt.rtz.x.f.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x7:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwcvt.xu.f.v |OPFVV|vfwcvt.xu.f.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x8:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwcvt.x.f.v  |OPFVV|vfwcvt.x.f.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x9:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwcvt.f.xu.v |OPFVV|vfwcvt.f.xu.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0xa:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwcvt.f.x.v  |OPFVV|vfwcvt.f.x.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0xb:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwcvt.f.f.v  |OPFVV|vfwcvt.f.f.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0xc:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwcvt.rtz.xu.f.v|OPFVV|vfwcvt.rtz.xu.f.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0xe:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwcvt.rtz.x.f.v|OPFVV|vfwcvt.rtz.x.f.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0xf:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfncvt.xu.f.w |OPFVV|vfncvt.xu.f.w vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x10:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfncvt.x.f.w  |OPFVV|vfncvt.x.f.w vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x11:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfncvt.f.xu.w |OPFVV|vfncvt.f.xu.w vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x12:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfncvt.f.x.w  |OPFVV|vfncvt.f.x.w vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x13:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfncvt.f.f.w  |OPFVV|vfncvt.f.f.w vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x14:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfncvt.rod.f.f.w|OPFVV|vfncvt.rod.f.f.w vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfncvt.rtz.xu.f.w|OPFVV|vfncvt.rtz.xu.f.w vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x16:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfncvt.rtz.x.f.w|OPFVV|vfncvt.rtz.x.f.w vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x17:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfsqrt.v      |OPFVV|vfsqrt.v vd, vs2, vm|31..26=0x13:funct6 25:vm 24..20:vs2 19..15=0x0:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfrsqrt7.v    |OPFVV|vfrsqrt7.v vd, vs2, vm|31..26=0x13:funct6 25:vm 24..20:vs2 19..15=0x4:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfrec7.v      |OPFVV|vfrec7.v vd, vs2, vm|31..26=0x13:funct6 25:vm 24..20:vs2 19..15=0x5:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfclass.v     |OPFVV|vfclass.v vd, vs2, vm|31..26=0x13:funct6 25:vm 24..20:vs2 19..15=0x10:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwadd.vv     |OPFVV|vfwadd.vv vd, vs2, vs1, vm|31..26=0x30:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwredusum.vs |OPFVV|vfwredusum.vs vd, vs2, vs1, vm|31..26=0x31:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwsub.vv     |OPFVV|vfwsub.vv vd, vs2, vs1, vm|31..26=0x32:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwredosum.vs |OPFVV|vfwredosum.vs vd, vs2, vs1, vm|31..26=0x33:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwadd.wv     |OPFVV|vfwadd.wv vd, vs2, vs1, vm|31..26=0x34:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwsub.wv     |OPFVV|vfwsub.wv vd, vs2, vs1, vm|31..26=0x36:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwmul.vv     |OPFVV|vfwmul.vv vd, vs2, vs1, vm|31..26=0x38:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwmacc.vv    |OPFVV|vfwmacc.vv vd, vs1, vs2, vm|31..26=0x3c:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwnmacc.vv   |OPFVV|vfwnmacc.vv vd, vs1, vs2, vm|31..26=0x3d:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwmsac.vv    |OPFVV|vfwmsac.vv vd, vs1, vs2, vm|31..26=0x3e:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwnmsac.vv   |OPFVV|vfwnmsac.vv vd, vs1, vs2, vm|31..26=0x3f:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vadd.vx       |OPIVX|vadd.vx vd, vs2, rs1, vm|31..26=0x0:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vsub.vx       |OPIVX|vsub.vx vd, vs2, rs1, vm|31..26=0x2:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vrsub.vx      |OPIVX|vrsub.vx vd, vs2, rs1, vm|31..26=0x3:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vminu.vx      |OPIVX|vminu.vx vd, vs2, rs1, vm|31..26=0x4:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmin.vx       |OPIVX|vmin.vx vd, vs2, rs1, vm|31..26=0x5:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmaxu.vx      |OPIVX|vmaxu.vx vd, vs2, rs1, vm|31..26=0x6:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmax.vx       |OPIVX|vmax.vx vd, vs2, rs1, vm|31..26=0x7:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vand.vx       |OPIVX|vand.vx vd, vs2, rs1, vm|31..26=0x9:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vor.vx        |OPIVX|vor.vx vd, vs2, rs1, vm|31..26=0xa:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vxor.vx       |OPIVX|vxor.vx vd, vs2, rs1, vm|31..26=0xb:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vrgather.vx   |OPIVX|vrgather.vx vd, vs2, rs1, vm|31..26=0xc:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vslideup.vx   |OPIVX|vslideup.vx vd, vs2, rs1, vm|31..26=0xe:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vslidedown.vx |OPIVX|vslidedown.vx vd, vs2, rs1, vm|31..26=0xf:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vadc.vxm      |OPIVX|vadc.vxm vd, vs2, rs1, v0|31..26=0x10:funct6 25=0x0:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmadc.vxm     |OPIVX|vmadc.vxm vd, vs2, rs1, v0|31..26=0x11:funct6 25=0x0:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmadc.vx      |OPIVX|vmadc.vx vd, vs2, rs1|31..26=0x11:funct6 25=0x1:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vsbc.vxm      |OPIVX|vsbc.vxm vd, vs2, rs1, v0|31..26=0x12:funct6 25=0x0:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmsbc.vxm     |OPIVX|vmsbc.vxm vd, vs2, rs1, v0|31..26=0x13:funct6 25=0x0:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmsbc.vx      |OPIVX|vmsbc.vx vd, vs2, rs1|31..26=0x13:funct6 25=0x1:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmerge.vxm    |OPIVX|vmerge.vxm vd, vs2, rs1, v0|31..26=0x17:funct6 25=0x0:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmv.v.x       |OPIVX|vmv.v.x vd, rs1|31..26=0x17:funct6 25=0x1:vm 24..20=0x0:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmseq.vx      |OPIVX|vmseq.vx vd, vs2, rs1, vm|31..26=0x18:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmsne.vx      |OPIVX|vmsne.vx vd, vs2, rs1, vm|31..26=0x19:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmsltu.vx     |OPIVX|vmsltu.vx vd, vs2, rs1, vm|31..26=0x1a:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmslt.vx      |OPIVX|vmslt.vx vd, vs2, rs1, vm|31..26=0x1b:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmsleu.vx     |OPIVX|vmsleu.vx vd, vs2, rs1, vm|31..26=0x1c:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmsle.vx      |OPIVX|vmsle.vx vd, vs2, rs1, vm|31..26=0x1d:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmsgtu.vx     |OPIVX|vmsgtu.vx vd, vs2, rs1, vm|31..26=0x1e:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vmsgt.vx      |OPIVX|vmsgt.vx vd, vs2, rs1, vm|31..26=0x1f:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vsaddu.vx     |OPIVX|vsaddu.vx vd, vs2, rs1, vm|31..26=0x20:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vsadd.vx      |OPIVX|vsadd.vx vd, vs2, rs1, vm|31..26=0x21:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vssubu.vx     |OPIVX|vssubu.vx vd, vs2, rs1, vm|31..26=0x22:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vssub.vx      |OPIVX|vssub.vx vd, vs2, rs1, vm|31..26=0x23:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vsll.vx       |OPIVX|vsll.vx vd, vs2, rs1, vm|31..26=0x25:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vsmul.vx      |OPIVX|vsmul.vx vd, vs2, rs1, vm|31..26=0x27:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vsrl.vx       |OPIVX|vsrl.vx vd, vs2, rs1, vm|31..26=0x28:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vsra.vx       |OPIVX|vsra.vx vd, vs2, rs1, vm|31..26=0x29:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vssrl.vx      |OPIVX|vssrl.vx vd, vs2, rs1, vm|31..26=0x2a:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vssra.vx      |OPIVX|vssra.vx vd, vs2, rs1, vm|31..26=0x2b:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vnsrl.wx      |OPIVX|vnsrl.wx vd, vs2, rs1, vm|31..26=0x2c:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vnsra.wx      |OPIVX|vnsra.wx vd, vs2, rs1, vm|31..26=0x2d:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vnclipu.wx    |OPIVX|vnclipu.wx vd, vs2, rs1, vm|31..26=0x2e:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vnclip.wx     |OPIVX|vnclip.wx vd, vs2, rs1, vm|31..26=0x2f:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vadd.vv       |OPIVV|vadd.vv vd, vs2, vs1, vm|31..26=0x0:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vsub.vv       |OPIVV|vsub.vv vd, vs2, vs1, vm|31..26=0x2:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vminu.vv      |OPIVV|vminu.vv vd, vs2, vs1, vm|31..26=0x4:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmin.vv       |OPIVV|vmin.vv vd, vs2, vs1, vm|31..26=0x5:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmaxu.vv      |OPIVV|vmaxu.vv vd, vs2, vs1, vm|31..26=0x6:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmax.vv       |OPIVV|vmax.vv vd, vs2, vs1, vm|31..26=0x7:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vand.vv       |OPIVV|vand.vv vd, vs2, vs1, vm|31..26=0x9:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vor.vv        |OPIVV|vor.vv vd, vs2, vs1, vm|31..26=0xa:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vxor.vv       |OPIVV|vxor.vv vd, vs2, vs1, vm|31..26=0xb:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vrgather.vv   |OPIVV|vrgather.vv vd, vs2, vs1, vm|31..26=0xc:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vrgatherei16.vv|OPIVV|vrgatherei16.vv vd, vs2, vs1, vm|31..26=0xe:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vadc.vvm      |OPIVV|vadc.vvm vd, vs2, vs1, v0|31..26=0x10:funct6 25=0x0:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmadc.vvm     |OPIVV|vmadc.vvm vd, vs2, vs1, v0|31..26=0x11:funct6 25=0x0:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmadc.vv      |OPIVV|vmadc.vv vd, vs2, vs1|31..26=0x11:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vsbc.vvm      |OPIVV|vsbc.vvm vd, vs2, vs1, v0|31..26=0x12:funct6 25=0x0:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmsbc.vvm     |OPIVV|vmsbc.vvm vd, vs2, vs1, v0|31..26=0x13:funct6 25=0x0:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmsbc.vv      |OPIVV|vmsbc.vv vd, vs2, vs1|31..26=0x13:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmerge.vvm    |OPIVV|vmerge.vvm vd, vs2, vs1, v0|31..26=0x17:funct6 25=0x0:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmv.v.v       |OPIVV|vmv.v.v vd, vs1|31..26=0x17:funct6 25=0x1:vm 24..20=0x0:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmseq.vv      |OPIVV|vmseq.vv vd, vs2, vs1, vm|31..26=0x18:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmsne.vv      |OPIVV|vmsne.vv vd, vs2, vs1, vm|31..26=0x19:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmsltu.vv     |OPIVV|vmsltu.vv vd, vs2, vs1, vm|31..26=0x1a:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmslt.vv      |OPIVV|vmslt.vv vd, vs2, vs1, vm|31..26=0x1b:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmsleu.vv     |OPIVV|vmsleu.vv vd, vs2, vs1, vm|31..26=0x1c:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vmsle.vv      |OPIVV|vmsle.vv vd, vs2, vs1, vm|31..26=0x1d:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vsaddu.vv     |OPIVV|vsaddu.vv vd, vs2, vs1, vm|31..26=0x20:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vsadd.vv      |OPIVV|vsadd.vv vd, vs2, vs1, vm|31..26=0x21:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vssubu.vv     |OPIVV|vssubu.vv vd, vs2, vs1, vm|31..26=0x22:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vssub.vv      |OPIVV|vssub.vv vd, vs2, vs1, vm|31..26=0x23:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vsll.vv       |OPIVV|vsll.vv vd, vs2, vs1, vm|31..26=0x25:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vsmul.vv      |OPIVV|vsmul.vv vd, vs2, vs1, vm|31..26=0x27:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vsrl.vv       |OPIVV|vsrl.vv vd, vs2, vs1, vm|31..26=0x28:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vsra.vv       |OPIVV|vsra.vv vd, vs2, vs1, vm|31..26=0x29:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vssrl.vv      |OPIVV|vssrl.vv vd, vs2, vs1, vm|31..26=0x2a:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vssra.vv      |OPIVV|vssra.vv vd, vs2, vs1, vm|31..26=0x2b:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vnsrl.wv      |OPIVV|vnsrl.wv vd, vs2, vs1, vm|31..26=0x2c:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vnsra.wv      |OPIVV|vnsra.wv vd, vs2, vs1, vm|31..26=0x2d:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vnclipu.wv    |OPIVV|vnclipu.wv vd, vs2, vs1, vm|31..26=0x2e:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vnclip.wv     |OPIVV|vnclip.wv vd, vs2, vs1, vm|31..26=0x2f:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vwredsumu.vs  |OPIVV|vwredsumu.vs vd, vs2, vs1, vm|31..26=0x30:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vwredsum.vs   |OPIVV|vwredsum.vs vd, vs2, vs1, vm|31..26=0x31:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vadd.vi       |OPIVI|vadd.vi vd, vs2, imm, vm|31..26=0x0:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vrsub.vi      |OPIVI|vrsub.vi vd, vs2, imm, vm|31..26=0x3:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vand.vi       |OPIVI|vand.vi vd, vs2, imm, vm|31..26=0x9:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vor.vi        |OPIVI|vor.vi vd, vs2, imm, vm|31..26=0xa:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vxor.vi       |OPIVI|vxor.vi vd, vs2, imm, vm|31..26=0xb:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vrgather.vi   |OPIVI|vrgather.vi vd, vs2, uimm, vm|31..26=0xc:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vslideup.vi   |OPIVI|vslideup.vi vd, vs2, uimm, vm|31..26=0xe:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vslidedown.vi |OPIVI|vslidedown.vi vd, vs2, uimm, vm|31..26=0xf:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vadc.vim      |OPIVI|vadc.vim vd, vs2, imm, v0|31..26=0x10:funct6 25=0x0:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmadc.vim     |OPIVI|vmadc.vim vd, vs2, imm, v0|31..26=0x11:funct6 25=0x0:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmadc.vi      |OPIVI|vmadc.vi vd, vs2, imm|31..26=0x11:funct6 25=0x1:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmerge.vim    |OPIVI|vmerge.vim vd, vs2, imm, v0|31..26=0x17:funct6 25=0x0:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmv.v.i       |OPIVI|vmv.v.i vd, imm|31..26=0x17:funct6 25=0x1:vm 24..20=0x0:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmseq.vi      |OPIVI|vmseq.vi vd, vs2, imm, vm|31..26=0x18:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmsne.vi      |OPIVI|vmsne.vi vd, vs2, imm, vm|31..26=0x19:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmsleu.vi     |OPIVI|vmsleu.vi vd, vs2, imm, vm|31..26=0x1c:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmsle.vi      |OPIVI|vmsle.vi vd, vs2, imm, vm|31..26=0x1d:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmsgtu.vi     |OPIVI|vmsgtu.vi vd, vs2, imm, vm|31..26=0x1e:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmsgt.vi      |OPIVI|vmsgt.vi vd, vs2, imm, vm|31..26=0x1f:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vsaddu.vi     |OPIVI|vsaddu.vi vd, vs2, imm, vm|31..26=0x20:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vsadd.vi      |OPIVI|vsadd.vi vd, vs2, imm, vm|31..26=0x21:funct6 25:vm 24..20:vs2 19..15:simm5 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vsll.vi       |OPIVI|vsll.vi vd, vs2, uimm, vm|31..26=0x25:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmv1r.v       |OPIVI|vmv1r.v vd, vs2|31..26=0x27:funct6 25=0x1:vm 24..20:vs2 19..15=0x0:vs1 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmv2r.v       |OPIVI|vmv2r.v vd, vs2|31..26=0x27:funct6 25=0x1:vm 24..20:vs2 19..15=0x1:vs1 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmv4r.v       |OPIVI|vmv4r.v vd, vs2|31..26=0x27:funct6 25=0x1:vm 24..20:vs2 19..15=0x3:vs1 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vmv8r.v       |OPIVI|vmv8r.v vd, vs2|31..26=0x27:funct6 25=0x1:vm 24..20:vs2 19..15=0x7:vs1 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vsrl.vi       |OPIVI|vsrl.vi vd, vs2, uimm, vm|31..26=0x28:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vsra.vi       |OPIVI|vsra.vi vd, vs2, uimm, vm|31..26=0x29:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vssrl.vi      |OPIVI|vssrl.vi vd, vs2, uimm, vm|31..26=0x2a:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vssra.vi      |OPIVI|vssra.vi vd, vs2, uimm, vm|31..26=0x2b:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vnsrl.wi      |OPIVI|vnsrl.wi vd, vs2, uimm, vm|31..26=0x2c:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vnsra.wi      |OPIVI|vnsra.wi vd, vs2, uimm, vm|31..26=0x2d:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vnclipu.wi    |OPIVI|vnclipu.wi vd, vs2, uimm, vm|31..26=0x2e:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vnclip.wi     |OPIVI|vnclip.wi vd, vs2, uimm, vm|31..26=0x2f:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+vredsum.vs    |OPMVV|vredsum.vs vd, vs2, vs1, vm|31..26=0x0:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vredand.vs    |OPMVV|vredand.vs vd, vs2, vs1, vm|31..26=0x1:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vredor.vs     |OPMVV|vredor.vs vd, vs2, vs1, vm|31..26=0x2:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vredxor.vs    |OPMVV|vredxor.vs vd, vs2, vs1, vm|31..26=0x3:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vredminu.vs   |OPMVV|vredminu.vs vd, vs2, vs1, vm|31..26=0x4:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vredmin.vs    |OPMVV|vredmin.vs vd, vs2, vs1, vm|31..26=0x5:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vredmaxu.vs   |OPMVV|vredmaxu.vs vd, vs2, vs1, vm|31..26=0x6:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vredmax.vs    |OPMVV|vredmax.vs vd, vs2, vs1, vm|31..26=0x7:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vaaddu.vv     |OPMVV|vaaddu.vv vd, vs2, vs1, vm|31..26=0x8:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vaadd.vv      |OPMVV|vaadd.vv vd, vs2, vs1, vm|31..26=0x9:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vasubu.vv     |OPMVV|vasubu.vv vd, vs2, vs1, vm|31..26=0xa:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vasub.vv      |OPMVV|vasub.vv vd, vs2, vs1, vm|31..26=0xb:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmv.x.s       |OPMVV|vmv.x.s rd, vs2|31..26=0x10:funct6 25=0x1:vm 24..20:vs2 19..15=0x0:vs1 14..12=0x2:funct3 11..7:rd 6..0=0x57
+vzext.vf8     |OPMVV|vzext.vf8 vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x2:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vsext.vf8     |OPMVV|vsext.vf8 vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x3:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vzext.vf4     |OPMVV|vzext.vf4 vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x4:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vsext.vf4     |OPMVV|vsext.vf4 vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x5:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vzext.vf2     |OPMVV|vzext.vf2 vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x6:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vsext.vf2     |OPMVV|vsext.vf2 vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x7:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vcompress.vm  |OPMVV|vcompress.vm vd, vs2, vs1|31..26=0x17:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmandn.mm     |OPMVV|vmandn.mm vd, vs2, vs1|31..26=0x18:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmand.mm      |OPMVV|vmand.mm vd, vs2, vs1|31..26=0x19:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmor.mm       |OPMVV|vmor.mm vd, vs2, vs1|31..26=0x1a:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmxor.mm      |OPMVV|vmxor.mm vd, vs2, vs1|31..26=0x1b:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmorn.mm      |OPMVV|vmorn.mm vd, vs2, vs1|31..26=0x1c:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmnand.mm     |OPMVV|vmnand.mm vd, vs2, vs1|31..26=0x1d:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmnor.mm      |OPMVV|vmnor.mm vd, vs2, vs1|31..26=0x1e:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmxnor.mm     |OPMVV|vmxnor.mm vd, vs2, vs1|31..26=0x1f:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmsbf.m       |OPMVV|vmsbf.m vd, vs2, vm|31..26=0x14:funct6 25:vm 24..20:vs2 19..15=0x1:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmsof.m       |OPMVV|vmsof.m vd, vs2, vm|31..26=0x14:funct6 25:vm 24..20:vs2 19..15=0x2:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmsif.m       |OPMVV|vmsif.m vd, vs2, vm|31..26=0x14:funct6 25:vm 24..20:vs2 19..15=0x3:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+viota.m       |OPMVV|viota.m vd, vs2, vm|31..26=0x14:funct6 25:vm 24..20:vs2 19..15=0x10:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vid.v         |OPMVV|vid.v vd, vm|31..26=0x14:funct6 25:vm 24..20=0x0:vs2 19..15=0x11:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vcpop.m       |OPMVV|vcpop.m rd, vs2, vm|31..26=0x10:funct6 25:vm 24..20:vs2 19..15=0x10:vs1 14..12=0x2:funct3 11..7:rd 6..0=0x57
+vfirst.m      |OPMVV|vfirst.m rd, vs2, vm|31..26=0x10:funct6 25:vm 24..20:vs2 19..15=0x11:vs1 14..12=0x2:funct3 11..7:rd 6..0=0x57
+vdivu.vv      |OPMVV|vdivu.vv vd, vs2, vs1, vm|31..26=0x20:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vdiv.vv       |OPMVV|vdiv.vv vd, vs2, vs1, vm|31..26=0x21:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vremu.vv      |OPMVV|vremu.vv vd, vs2, vs1, vm|31..26=0x22:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vrem.vv       |OPMVV|vrem.vv vd, vs2, vs1, vm|31..26=0x23:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmulhu.vv     |OPMVV|vmulhu.vv vd, vs2, vs1, vm|31..26=0x24:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmul.vv       |OPMVV|vmul.vv vd, vs2, vs1, vm|31..26=0x25:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmulhsu.vv    |OPMVV|vmulhsu.vv vd, vs2, vs1, vm|31..26=0x26:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmulh.vv      |OPMVV|vmulh.vv vd, vs2, vs1, vm|31..26=0x27:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmadd.vv      |OPMVV|vmadd.vv vd, vs1, vs2, vm|31..26=0x29:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vnmsub.vv     |OPMVV|vnmsub.vv vd, vs1, vs2, vm|31..26=0x2b:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vmacc.vv      |OPMVV|vmacc.vv vd, vs1, vs2, vm|31..26=0x2d:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vnmsac.vv     |OPMVV|vnmsac.vv vd, vs1, vs2, vm|31..26=0x2f:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwaddu.vv     |OPMVV|vwaddu.vv vd, vs2, vs1, vm|31..26=0x30:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwadd.vv      |OPMVV|vwadd.vv vd, vs2, vs1, vm|31..26=0x31:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwsubu.vv     |OPMVV|vwsubu.vv vd, vs2, vs1, vm|31..26=0x32:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwsub.vv      |OPMVV|vwsub.vv vd, vs2, vs1, vm|31..26=0x33:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwaddu.wv     |OPMVV|vwaddu.wv vd, vs2, vs1, vm|31..26=0x34:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwadd.wv      |OPMVV|vwadd.wv vd, vs2, vs1, vm|31..26=0x35:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwsubu.wv     |OPMVV|vwsubu.wv vd, vs2, vs1, vm|31..26=0x36:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwsub.wv      |OPMVV|vwsub.wv vd, vs2, vs1, vm|31..26=0x37:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwmulu.vv     |OPMVV|vwmulu.vv vd, vs2, vs1, vm|31..26=0x38:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwmulsu.vv    |OPMVV|vwmulsu.vv vd, vs2, vs1, vm|31..26=0x3a:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwmul.vv      |OPMVV|vwmul.vv vd, vs2, vs1, vm|31..26=0x3b:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwmaccu.vv    |OPMVV|vwmaccu.vv vd, vs1, vs2, vm|31..26=0x3c:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwmacc.vv     |OPMVV|vwmacc.vv vd, vs1, vs2, vm|31..26=0x3d:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwmaccsu.vv   |OPMVV|vwmaccsu.vv vd, vs1, vs2, vm|31..26=0x3f:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vaaddu.vx     |OPMVX|vaaddu.vx vd, vs2, rs1, vm|31..26=0x8:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vaadd.vx      |OPMVX|vaadd.vx vd, vs2, rs1, vm|31..26=0x9:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vasubu.vx     |OPMVX|vasubu.vx vd, vs2, rs1, vm|31..26=0xa:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vasub.vx      |OPMVX|vasub.vx vd, vs2, rs1, vm|31..26=0xb:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vmv.s.x       |OPMVX|vmv.s.x vd, rs1|31..26=0x10:funct6 25=0x1:vm 24..20=0x0:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vslide1up.vx  |OPMVX|vslide1up.vx vd, vs2, rs1, vm|31..26=0xe:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vslide1down.vx|OPMVX|vslide1down.vx vd, vs2, rs1, vm|31..26=0xf:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vdivu.vx      |OPMVX|vdivu.vx vd, vs2, rs1, vm|31..26=0x20:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vdiv.vx       |OPMVX|vdiv.vx vd, vs2, rs1, vm|31..26=0x21:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vremu.vx      |OPMVX|vremu.vx vd, vs2, rs1, vm|31..26=0x22:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vrem.vx       |OPMVX|vrem.vx vd, vs2, rs1, vm|31..26=0x23:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vmulhu.vx     |OPMVX|vmulhu.vx vd, vs2, rs1, vm|31..26=0x24:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vmul.vx       |OPMVX|vmul.vx vd, vs2, rs1, vm|31..26=0x25:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vmulhsu.vx    |OPMVX|vmulhsu.vx vd, vs2, rs1, vm|31..26=0x26:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vmulh.vx      |OPMVX|vmulh.vx vd, vs2, rs1, vm|31..26=0x27:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vmadd.vx      |OPMVX|vmadd.vx vd, rs1, vs2, vm|31..26=0x29:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vnmsub.vx     |OPMVX|vnmsub.vx vd, rs1, vs2, vm|31..26=0x2b:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vmacc.vx      |OPMVX|vmacc.vx vd, rs1, vs2, vm|31..26=0x2d:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vnmsac.vx     |OPMVX|vnmsac.vx vd, rs1, vs2, vm|31..26=0x2f:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwaddu.vx     |OPMVX|vwaddu.vx vd, vs2, rs1, vm|31..26=0x30:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwadd.vx      |OPMVX|vwadd.vx vd, vs2, rs1, vm|31..26=0x31:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwsubu.vx     |OPMVX|vwsubu.vx vd, vs2, rs1, vm|31..26=0x32:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwsub.vx      |OPMVX|vwsub.vx vd, vs2, rs1, vm|31..26=0x33:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwaddu.wx     |OPMVX|vwaddu.wx vd, vs2, rs1, vm|31..26=0x34:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwadd.wx      |OPMVX|vwadd.wx vd, vs2, rs1, vm|31..26=0x35:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwsubu.wx     |OPMVX|vwsubu.wx vd, vs2, rs1, vm|31..26=0x36:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwsub.wx      |OPMVX|vwsub.wx vd, vs2, rs1, vm|31..26=0x37:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwmulu.vx     |OPMVX|vwmulu.vx vd, vs2, rs1, vm|31..26=0x38:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwmulsu.vx    |OPMVX|vwmulsu.vx vd, vs2, rs1, vm|31..26=0x3a:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwmul.vx      |OPMVX|vwmul.vx vd, vs2, rs1, vm|31..26=0x3b:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwmaccu.vx    |OPMVX|vwmaccu.vx vd, rs1, vs2, vm|31..26=0x3c:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwmacc.vx     |OPMVX|vwmacc.vx vd, rs1, vs2, vm|31..26=0x3d:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwmaccus.vx   |OPMVX|vwmaccus.vx vd, rs1, vs2, vm|31..26=0x3e:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vwmaccsu.vx   |OPMVX|vwmaccsu.vx vd, rs1, vs2, vm|31..26=0x3f:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+
+# Zvfbfmin | Zvfbfmin – Vector BFloat16 Conversions | Ch. 24
+vfncvtbf16.f.f.w|OPFVV|vfncvtbf16.f.f.w vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x1d:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwcvtbf16.f.f.v|OPFVV|vfwcvtbf16.f.f.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0xd:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+
+# Zvfbfwma | Zvfbfwma – Vector BFloat16 Widening Multiply-Add | Ch. 24
+vfwmaccbf16.vv|OPFVV|vfwmaccbf16.vv vd, vs1, vs2, vm|31..26=0x3b:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x1:funct3 11..7:vd 6..0=0x57
+vfwmaccbf16.vf|OPFVF|vfwmaccbf16.vf vd, fs1, vs2, vm|31..26=0x3b:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x5:funct3 11..7:vd 6..0=0x57
+
+# Zvkb | Zvkb – Vector Crypto Bit-Manipulation | Ch. 32 – subset of Zvbb
+vandn.vv      |OPIVV|vandn.vv vd, vs2, vs1, vm|31..26=0x1:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vandn.vx      |OPIVX|vandn.vx vd, vs2, rs1, vm|31..26=0x1:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vbrev8.v      |OPMVV|vbrev8.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x8:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vrev8.v       |OPMVV|vrev8.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0x9:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vrol.vv       |OPIVV|vrol.vv vd, vs2, vs1, vm|31..26=0x15:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vrol.vx       |OPIVX|vrol.vx vd, vs2, rs1, vm|31..26=0x15:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vror.vv       |OPIVV|vror.vv vd, vs2, vs1, vm|31..26=0x14:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vror.vx       |OPIVX|vror.vx vd, vs2, rs1, vm|31..26=0x14:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vror.vi       |OPIVI|vror.vi vd, vs2, uimm, vm|31..27=0xa 26:uimm[5] 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+
+# Zvbb | Zvbb – Vector Basic Bit-Manipulation | Ch. 32 – Zvbb = Zvkb + these instructions
+vbrev.v       |OPMVV|vbrev.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0xa:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vclz.v        |OPMVV|vclz.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0xc:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vctz.v        |OPMVV|vctz.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0xd:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vcpop.v       |OPMVV|vcpop.v vd, vs2, vm|31..26=0x12:funct6 25:vm 24..20:vs2 19..15=0xe:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vwsll.vv      |OPIVV|vwsll.vv vd, vs2, vs1, vm|31..26=0x35:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x0:funct3 11..7:vd 6..0=0x57
+vwsll.vx      |OPIVX|vwsll.vx vd, vs2, rs1, vm|31..26=0x35:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x4:funct3 11..7:vd 6..0=0x57
+vwsll.vi      |OPIVI|vwsll.vi vd, vs2, uimm, vm|31..26=0x35:funct6 25:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x3:funct3 11..7:vd 6..0=0x57
+
+# Zvbc | Zvbc – Vector Carry-less Multiplication | Ch. 32 – SEW = 64 only
+vclmul.vv     |OPMVV|vclmul.vv vd, vs2, vs1, vm|31..26=0xc:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vclmul.vx     |OPMVX|vclmul.vx vd, vs2, rs1, vm|31..26=0xc:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+vclmulh.vv    |OPMVV|vclmulh.vv vd, vs2, vs1, vm|31..26=0xd:funct6 25:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x57
+vclmulh.vx    |OPMVX|vclmulh.vx vd, vs2, rs1, vm|31..26=0xd:funct6 25:vm 24..20:vs2 19..15:rs1 14..12=0x6:funct3 11..7:vd 6..0=0x57
+
+# Zvkg | Zvkg – Vector GCM/GMAC | Ch. 32 – element groups of 4 × 32 bits
+vgmul.vv      |OPMVV|vgmul.vv vd, vs2|31..26=0x28:funct6 25=0x1:vm 24..20:vs2 19..15=0x11:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vghsh.vv      |OPMVV|vghsh.vv vd, vs2, vs1|31..26=0x2c:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+
+# Zvkned | Zvkned – Vector AES Block Cipher | Ch. 32 – .vv: per element group; .vs: round key from element group 0 of vs2
+vaesdf.vv     |OPMVV|vaesdf.vv vd, vs2|31..26=0x28:funct6 25=0x1:vm 24..20:vs2 19..15=0x1:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vaesdf.vs     |OPMVV|vaesdf.vs vd, vs2|31..26=0x29:funct6 25=0x1:vm 24..20:vs2 19..15=0x1:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vaesdm.vv     |OPMVV|vaesdm.vv vd, vs2|31..26=0x28:funct6 25=0x1:vm 24..20:vs2 19..15=0x0:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vaesdm.vs     |OPMVV|vaesdm.vs vd, vs2|31..26=0x29:funct6 25=0x1:vm 24..20:vs2 19..15=0x0:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vaesef.vv     |OPMVV|vaesef.vv vd, vs2|31..26=0x28:funct6 25=0x1:vm 24..20:vs2 19..15=0x3:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vaesef.vs     |OPMVV|vaesef.vs vd, vs2|31..26=0x29:funct6 25=0x1:vm 24..20:vs2 19..15=0x3:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vaesem.vv     |OPMVV|vaesem.vv vd, vs2|31..26=0x28:funct6 25=0x1:vm 24..20:vs2 19..15=0x2:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vaesem.vs     |OPMVV|vaesem.vs vd, vs2|31..26=0x29:funct6 25=0x1:vm 24..20:vs2 19..15=0x2:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vaesz.vs      |OPMVV|vaesz.vs vd, vs2|31..26=0x29:funct6 25=0x1:vm 24..20:vs2 19..15=0x7:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vaeskf1.vi    |OPMVV|vaeskf1.vi vd, vs2, uimm|31..26=0x22:funct6 25=0x1:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vaeskf2.vi    |OPMVV|vaeskf2.vi vd, vs2, uimm|31..26=0x2a:funct6 25=0x1:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x2:funct3 11..7:vd 6..0=0x77
+
+# Zvknh | Zvknha / Zvknhb – Vector SHA-2 | Ch. 32 – Zvknha: SHA-256 (SEW = 32); Zvknhb: SHA-256 and SHA-512 (SEW = 32/64)
+vsha2ms.vv    |OPMVV|vsha2ms.vv vd, vs2, vs1|31..26=0x2d:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vsha2ch.vv    |OPMVV|vsha2ch.vv vd, vs2, vs1|31..26=0x2e:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vsha2cl.vv    |OPMVV|vsha2cl.vv vd, vs2, vs1|31..26=0x2f:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+
+# Zvksed | Zvksed – Vector SM4 Block Cipher | Ch. 32
+vsm4k.vi      |OPMVV|vsm4k.vi vd, vs2, uimm|31..26=0x21:funct6 25=0x1:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vsm4r.vv      |OPMVV|vsm4r.vv vd, vs2|31..26=0x28:funct6 25=0x1:vm 24..20:vs2 19..15=0x10:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vsm4r.vs      |OPMVV|vsm4r.vs vd, vs2|31..26=0x29:funct6 25=0x1:vm 24..20:vs2 19..15=0x10:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
+
+# Zvksh | Zvksh – Vector SM3 Hash | Ch. 32
+vsm3c.vi      |OPMVV|vsm3c.vi vd, vs2, uimm|31..26=0x2b:funct6 25=0x1:vm 24..20:vs2 19..15:uimm[4:0] 14..12=0x2:funct3 11..7:vd 6..0=0x77
+vsm3me.vv     |OPMVV|vsm3me.vv vd, vs2, vs1|31..26=0x20:funct6 25=0x1:vm 24..20:vs2 19..15:vs1 14..12=0x2:funct3 11..7:vd 6..0=0x77
 </script>
 
 <script>
